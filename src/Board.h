@@ -17,12 +17,18 @@ private:
 
 public:
 	Board() {
+		for(int i = 1; i <= 15; i++) {
+			for(int j = 1; j <= 15; j++) {
+				cells[i-1][j-1].setState(Cell::EMPTY);
+				cells[i-1][j-1].setPosition(i, j);
+			}
+		}
 	}
-
 
 	void setCell(int x, int y, Cell::STATE state);
 	Cell getCell(int x, int y) { return cells[x-1][y-1]; }
-	int gettt() { return 0; }
+	int checkPath(Cell start, int count, Cell::DIRECTION direction);
+	int checkPath(Cell start, Cell::DIRECTION direction);
 
 	friend std::ostream& operator<<(std::ostream &out, Board &board);
 };
