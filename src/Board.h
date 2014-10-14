@@ -19,8 +19,10 @@ public:
 	Board() {
 	}
 
-	void setCell(int x, int y, int state);
-	Cell getCell(int x, int y);
 
-	friend std::ostream& operator<<(std::ostream &out, const Board &board);
+	void setCell(int x, int y, Cell::STATE state);
+	Cell getCell(int x, int y) { return cells[x-1][y-1]; }
+	int gettt() { return 0; }
+
+	friend std::ostream& operator<<(std::ostream &out, Board &board);
 };
