@@ -29,6 +29,8 @@ public:
 	Cell getCell(int x, int y) { return cells[x-1][y-1]; }
 	int checkPath(Cell start, int count, Cell::DIRECTION direction);
 	int checkPath(Cell start, Cell::DIRECTION direction);
+	bool isMoveValid(Cell start);
+	void finish(Cell::STATE state);
 
 	friend std::ostream& operator<<(std::ostream &out, Board &board);
 };
