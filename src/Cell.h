@@ -3,7 +3,7 @@
 class Cell {
 public:
 	enum DIRECTION { N, NE, E, SE, S, SW, W, NW };
-	enum STATE { EMPTY, BLACK, WHITE };
+	enum STATE { EMPTY, BLACK, WHITE, OFF_BOARD };
 private:
 	STATE state;
 	int x, y;

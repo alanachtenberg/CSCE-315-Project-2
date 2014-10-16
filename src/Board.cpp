@@ -6,6 +6,19 @@
 
 using namespace std;
 
+//internal helper functions
+//----------------------------------------------------------------------
+Cell Board::getCell(int x, int y) {
+	if(x > 0 && y > 0 && x < 16 && y < 16) {
+		return cells[x-1][y-1];
+	}
+	else {
+		Cell cell;
+		cell.setState(Cell::OFF_BOARD);
+		return cell;
+	}
+}
+
 void Board::setCell(int x, int y, Cell::STATE state) {
 	Cell cell;
 	cell.setState(state);
@@ -21,7 +34,7 @@ void Board::setCell(int x, int y, Cell::STATE state) {
 		break;
 	case 2:
 		cout << "Position (" << x << ", " << y << ") already taken\n";
-		break
+		break;
 	case 3:
 		cout << "Cannot place a piece that would simultaneously form multiple open rows of three\n";
 		break;
@@ -31,8 +44,8 @@ void Board::setCell(int x, int y, Cell::STATE state) {
 	}
 }
 
-//wrapper to make it easy to check, recursive step needs count which the
-//caller should not need to see
+//wrapper to make it easy to use, recursive step needs count which the caller
+//should not need to see, and doesn't have to remember the starting value
 int Board::checkPath(Cell start, Cell::DIRECTION direction) {
 	return checkPath(start, 1, direction);
 }
@@ -83,10 +96,8 @@ int Board::checkPath(Cell start, int count, Cell::DIRECTION direction) {
 			break;
 	}
 
-	//next piece is off the board, return current count
-	if(nextX > 15 || nextX < 1 ||  nextY > 15 || nextY < 1) return count;
-
 	//get next cell. If it is the same color as the current cell, recurse
+	//if it is a different color, empty, or off the board, return count
 	Cell nextCell = getCell(nextX, nextY);
 	if(nextCell.getState() == start.getState()) {
 		count++;
@@ -101,17 +112,16 @@ int Board::checkPath(Cell start, int count, Cell::DIRECTION direction) {
 //	2: Position is already taken
 //	3: Rule of 3 would be violated
 //	4: User tried to place an empty piece (should never happen)
-bool Board::isMoveValid(Cell cell) {
-	if(getCell(x, y).getState() != Cell::EMPTY) {
+int Board::isMoveValid(Cell cell) {
+	if(getCell(cell.getX(), cell.getY()).getState() != Cell::EMPTY) {
 		return 2; //position already taken
 	}
-	else if(state == Cell::EMPTY) {
+	else if(cell.getState()  == Cell::EMPTY) {
 		return 4; //user tried to place an empty piece
 	}
-	//get the number of pieces in all directions from where it should
-	//be placed for easy use, in order of N, NE, E, SE, S, SW, W, NW
+	//get the number of pieces in all directions, and whether it is an
+	//open row, in order of N, NE, E, SE, S, SW, W, NW
 	int dirs[8];
-
 	dirs[0] = checkPath(cell, Cell::N);
 	dirs[1] = checkPath(cell, Cell::NE);
 	dirs[2] = checkPath(cell, Cell::E);
@@ -121,6 +131,16 @@ bool Board::isMoveValid(Cell cell) {
 	dirs[6] = checkPath(cell, Cell::W);
 	dirs[7] = checkPath(cell, Cell::NW);
 
+	bool open[8];
+	open[0] = (getCell(cell.getX(), 		  cell.getY() - dirs[0]).getState() == Cell::EMPTY);
+	open[1] = (getCell(cell.getX() + dirs[1], cell.getY() - dirs[1]).getState() == Cell::EMPTY);
+	open[2] = (getCell(cell.getX() + dirs[2], cell.getY()    	   ).getState() == Cell::EMPTY);
+	open[3] = (getCell(cell.getX() + dirs[3], cell.getY() + dirs[3]).getState() == Cell::EMPTY);
+	open[4] = (getCell(cell.getX(), 		  cell.getY() + dirs[4]).getState() == Cell::EMPTY);
+	open[5] = (getCell(cell.getX() - dirs[5], cell.getY() + dirs[5]).getState() == Cell::EMPTY);
+	open[6] = (getCell(cell.getX() - dirs[6], cell.getY()   	   ).getState() == Cell::EMPTY);
+	open[7] = (getCell(cell.getX() - dirs[7], cell.getY() - dirs[6]).getState() == Cell::EMPTY);
+
 	//check for winning condition of a row of exactly 5
 	for(int i = 0; i < 4; i++) {
 		if((dirs[i] + dirs[i+4] - 1) == 5) {
@@ -129,15 +149,16 @@ bool Board::isMoveValid(Cell cell) {
 	}
 
 	//check the surrounding pieces for the threes rule
-	//TODO: check to see if grouping of three is open or closed
 	int threes_rule = 0;
 	for(int i = 0; i < 8; i++) {
-		if(dirs[i] == 4) threes_rule++;
+		if(dirs[i] == 4 && open[i]) {
+			threes_rule++;
+		}
 	}
 
 	if(threes_rule >= 2) {
 		Cell test_for_loss = cell;
-		if(cell.getState() == Cell::BLACK) {
+		if(cell.getState() == Cell::BLACK)
 			test_for_loss.setState(Cell::WHITE);
 		else
 			test_for_loss.setState(Cell::BLACK);
