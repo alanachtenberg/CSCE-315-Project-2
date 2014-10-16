@@ -1,4 +1,4 @@
-#include <vector>
+#include <stack>
 #include "Cell.h"
 #include "Player.h"
 
@@ -8,6 +8,9 @@ private:
 //----------------------------------------------------------------------
 	//board as 2D array of cells
 	Cell cells[15][15];
+
+	//stacks for undo, redo
+	std::stack<Board> game_history, undo_history;
 
 	//2 players only
 	Player black, white;
@@ -42,6 +45,10 @@ public:
 //----------------------------------------------------------------------
 	Cell::STATE getTurn() { return turn; }
 	void placePiece(int x, int y);
+	void undo();
+	void redo();
+	void setDifficulty(Player::DIFFICULTY difficulty);
+
 
 	friend std::ostream& operator<<(std::ostream &out, Board &board);
 };
