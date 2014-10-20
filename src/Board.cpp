@@ -19,18 +19,36 @@ Cell Board::getCell(int x, int y) {
 	}
 }
 
-void Board::setCell(int x, int y, Cell::STATE state) {
+void Board::placePiece(int x, int y) {
 	Cell cell;
-	cell.setState(state);
+	cell.setState(turn);
 	cell.setPosition(x, y);
 	switch(isMoveValid(cell)) {
 	case 0:
-		//set cell
+		//set cell to current piece
 		cells[x-1][y-1] = cell;
+		game_history.push(cell);
+		if(turn == Cell::WHITE) {
+			turn = Cell::BLACK;
+		}
+		else {
+			moves++;
+			turn = Cell::WHITE;
+		}
+		if(display) cout << *this;
 		break;
 	case 1:
+		//set cell to current piece
 		cells[x-1][y-1] = cell;
-		finish(state);
+		game_history.push(cell);
+		if(turn == Cell::WHITE) {
+		}
+		else {
+			moves++;
+		}
+		if(display) cout << *this;
+
+		finish(turn);
 		break;
 	case 2:
 		cout << "Position (" << x << ", " << y << ") already taken\n";
@@ -177,11 +195,69 @@ int Board::isMoveValid(Cell cell) {
 }
 
 void Board::finish(Cell::STATE state) {
+	timer.finish();
 
 	if(state == Cell::BLACK) cout << "Black ";
 	else cout << "White ";
 
 	cout << "player has won the game!\n";
+	cout << "***STATS***\n";
+	cout << "Game Time: " << timer << "\n";
+	cout << "Moves: " << moves << "\n";
+	exit(0);
+}
+
+void Board::undo() {
+	if(game_history.size() > 0) {
+		Cell cell = game_history.top();
+		game_history.pop();
+		cells[cell.getX()-1][cell.getY()-1].setState(Cell::EMPTY);
+
+		turn = (turn == Cell::WHITE) ? turn = Cell::BLACK : turn = Cell::WHITE;
+		undo_history.push(cell);
+	}
+	else {
+		cout << "No moves to undo\n";
+	}
+}
+
+void Board::redo() {
+	if(game_history.size() > 0) {
+		Cell cell = undo_history.top();
+		undo_history.pop();
+		cells[cell.getX()-1][cell.getY()-1].setState(cell.getState());
+
+		turn = (turn == Cell::WHITE) ? turn = Cell::BLACK : turn = Cell::WHITE;
+		game_history.push(cell);
+	}
+	else {
+		cout << "No moves to redo\n";
+	}
+}
+
+bool Board::command(std::string cmd) {
+	//we have a comment, ignore rest of line
+	if(cmd.at(0) == ';') ;
+	//we have a move
+	else if(cmd.size() == 2) {
+		char x_char, y_char;
+		x_char = cmd.at(0);
+		y_char = cmd.at(1);
+
+		int x, y;
+		std::stringstream ss;
+		ss << x_char << " " << y_char;
+		ss >> hex >> x;
+		ss >> hex >> y;
+		placePiece(x, y);
+	}
+	else if(cmd == "UNDO") undo();
+	else if(cmd == "REDO") redo();
+	else if(cmd == "EXIT") exit(0);
+	else if(cmd == "DISPLAY") display = (display) ? false : true;
+	else return false;
+
+	return true;
 }
 
 ostream& operator<<(ostream &out, Board &board) {
@@ -203,4 +279,14 @@ ostream& operator<<(ostream &out, Board &board) {
 	}
 
 	return out;
+}
+
+istream& operator>>(istream &in, Board &board) {
+	std::string cmd;
+	in >> cmd;
+	if(cmd.at(0) == ';') {
+		getline(in, cmd);
+		cmd = ";" + cmd;
+	}
+	board.command(cmd);
 }

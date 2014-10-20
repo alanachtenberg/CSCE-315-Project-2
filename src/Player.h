@@ -4,8 +4,6 @@ public:
 	enum DIFFICULTY { EASY, MEDIUM, HARD, RANDOM };
 
 private:
-	std::string name;
-	int color;
 
 public:
 	Player() {
