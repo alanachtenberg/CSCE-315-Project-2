@@ -267,7 +267,93 @@ string Board::command(std::string cmd) {
 
 	return "";
 }
+//--------------------------------
+//--------------------------------
 
+void Board::random_ai(){
+	Cell cell = game_history.top();
+
+	bool moved = false;								// used for while loop determining where to move
+
+	int dirs[8];
+	dirs[0] = checkPath(cell, Cell::N);
+	dirs[1] = checkPath(cell, Cell::NE);
+	dirs[2] = checkPath(cell, Cell::E);
+	dirs[3] = checkPath(cell, Cell::SE);
+	dirs[4] = checkPath(cell, Cell::S);
+	dirs[5] = checkPath(cell, Cell::SW);
+	dirs[6] = checkPath(cell, Cell::W);
+	dirs[7] = checkPath(cell, Cell::NW);
+
+	int N_to_S = dirs[0] + dirs[4];
+	int NE_to_SW = dirs[1] + dirs[5];
+	int E_to_W = dirs[2] + dirs[6];
+	int SE_to_NW = dirs[3] + dirs[7];
+	int random_X;									// In case AI makes random move we will need this
+	int random_Y;									// In case AI makes random move we will need this
+
+
+	if(N_to_S >= 3){
+		// if N can be covered cover
+		if(getCell(cell.getX(), cell.getY() - dirs[0]).getState() == Cell::EMPTY){
+			placePiece(cell.getX(), cell.getY() - dirs[0]);
+			moved = true;
+		}
+		// if S can be covered cover
+		if(getCell(cell.getX(), cell.getY() + dirs[4]).getState() == Cell::EMPTY){
+			placePiece(cell.getX(), cell.getY() + dirs[4]);
+			moved = true;
+		}
+	}
+	else if(NE_to_SW >= 3){
+		// if NE can be covered cover
+		if(getCell(cell.getX() + dirs[1], cell.getY() - dirs[1]).getState() == Cell::EMPTY){
+			placePiece(cell.getX() + dirs[1], cell.getY() - dirs[1]);
+			moved = true;
+		}
+		// if SW can be covered cover
+		if(getCell(cell.getX() - dirs[5], cell.getY() + dirs[5]).getState() == Cell::EMPTY){
+			placePiece(cell.getX() - dirs[5], cell.getY() + dirs[5]);
+			moved = true;
+		}
+	}
+	else if(E_to_W >= 3){
+		// if E can be covered cover
+		if(getCell(cell.getX() + dirs[2], cell.getY()).getState() == Cell::EMPTY){
+			placePiece(cell.getX() + dirs[2], cell.getY());
+			moved = true;
+		}
+		// if W can be covered cover
+		if(getCell(cell.getX() - dirs[6], cell.getY()).getState() == Cell::EMPTY){
+			placePiece(cell.getX() - dirs[6], cell.getY());
+			moved = true;
+		}
+	}
+	else if(SE_to_NW >= 3){
+		// if SE can be covered cover
+		if(getCell(cell.getX() + dirs[3], cell.getY() + dirs[3]).getState() == Cell::EMPTY){
+			placePiece(cell.getX() + dirs[3], cell.getY() + dirs[3]);
+			moved = true;
+		}
+		// if NW can be covered cover
+		if(getCell(cell.getX() - dirs[7], cell.getY() - dirs[6]).getState() == Cell::EMPTY){
+			placePiece(cell.getX() - dirs[7], cell.getY() - dirs[6]);
+			moved = true;
+		}
+	}
+
+	while(!moved){				// If no obvious moves or cant cover  make random move
+		random_X = 1 + rand() % 15;		// create a random number from 1 - 15 for X 
+		random_Y = 1 + rand() % 15;		// create a random number from 1 - 15 for Y
+		if(getCell(random_X, random_Y).getState() == Cell::EMPTY){
+			placePiece(random_X, random_Y);
+			moved = true;
+		}
+	}
+}
+
+//--------------------------------
+//--------------------------------
 
 ostream& operator<<(ostream &out, Board &board) {
 
