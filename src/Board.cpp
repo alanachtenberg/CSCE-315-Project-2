@@ -260,6 +260,12 @@ bool Board::command(std::string cmd) {
 	return true;
 }
 
+string Board::get_string_board(Board &board) {
+	stringstream board_ss;
+	board_ss<<board;
+	return board_ss.str();
+}
+
 ostream& operator<<(ostream &out, Board &board) {
 
 	out << "  ";

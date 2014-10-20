@@ -1,9 +1,7 @@
-
-
 #include "Server.h"
 
 
-    Server::Server(int port_num){
+Server::Server(int port_num) {
     open_port_fd=0;
     client_port_fd=0;
     memset(&client_addr, 0, sizeof(client_addr));
@@ -35,45 +33,47 @@
         cout<<"ERROR IN ACCEPT\n";
     string msg="---------\nHello you have connected to the 5 in a row server\n---------\n";
     send(client_port_fd, msg.c_str(), msg.size(), 0);//0 means no flags
+    board = Board();
+}
+
+Server::~Server() {
+    close(client_port_fd);//close client connection
+    close(open_port_fd);//closes open port
+    delete buffer;
+}
+
+
+void Server::send_msg(string s) {
+    if (s.size()>SOCKET_BUF_SIZE)
+        cout<<"ERROR MESSAGE SIZE TOO BIG\n";
+    else{
+        if(send(client_port_fd, s.c_str(), s.size(), 0)<0)//0 means no flags
+            cout<<"ERROR SENDING MESSAGE\n";
     }
 
-    Server::~Server(){
-        close(client_port_fd);//close client connection
-        close(open_port_fd);//closes open port
-        delete buffer;
+}
+
+string Server::read_msg() {
+    if(recv(client_port_fd, buffer, SOCKET_BUF_SIZE,0)<0)
+        cout<<"ERROR READING MESSAGE\n";
+    else
+        return string(buffer);
+    return string("error");
+}
+
+int Server::operator << (string& s) { //int is an error number, operator calls send_msg
+    int n=0;
+    if (s.size()>SOCKET_BUF_SIZE)
+        cout<<"ERROR MESSAGE SIZE TOO BIG\n";
+    else if((n=send(client_port_fd, s.c_str(), s.size(), 0))<0)//0 means no flags
+            cout<<"ERROR SENDING MESSAGE\n";
+    return n;
+}
+
+int Server::operator >> (string& s) { //int is an error number, operator calls read_msg
+    int n=0;
+    if((n=recv(client_port_fd, buffer, SOCKET_BUF_SIZE,0))<0)
+        cout<<"ERROR READING MESSAGE\n";
+    return n;
+
     }
-
-    void Server::send_msg(string s){
-        if (s.size()>SOCKET_BUF_SIZE)
-            cout<<"ERROR MESSAGE SIZE TOO BIG\n";
-        else{
-            if(send(client_port_fd, s.c_str(), s.size(), 0)<0)//0 means no flags
-                cout<<"ERROR SENDING MESSAGE\n";
-        }
-
-    }
-
-    string Server::read_msg(){
-        if(recv(client_port_fd, buffer, SOCKET_BUF_SIZE,0)<0)
-            cout<<"ERROR READING MESSAGE\n";
-        else
-            return string(buffer);
-        return string("error");
-    }
-
-    int Server::operator << (string& s){ //int is an error number, operator calls send_msg
-        int n=0;
-        if (s.size()>SOCKET_BUF_SIZE)
-            cout<<"ERROR MESSAGE SIZE TOO BIG\n";
-        else if((n=send(client_port_fd, s.c_str(), s.size(), 0))<0)//0 means no flags
-                cout<<"ERROR SENDING MESSAGE\n";
-        return n;
-    }
-
-    int Server::operator >> (string& s){ //int is an error number, operator calls read_msg
-        int n=0;
-        if((n=recv(client_port_fd, buffer, SOCKET_BUF_SIZE,0))<0)
-            cout<<"ERROR READING MESSAGE\n";
-        return n;
-
-        }

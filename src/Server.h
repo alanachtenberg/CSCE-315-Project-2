@@ -21,6 +21,7 @@ class Server {
         sockaddr_in server_addr; //address information of server, will set this to IPV4 adrress
         sockaddr    client_addr;// address information of client, will be set by accept call
         char*        buffer; //contains the write and read strings of the socket
+        Board board;
     public:
 
         Server(int port_num);   //initialize socket
