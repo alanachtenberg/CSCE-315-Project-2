@@ -10,6 +10,7 @@ using namespace std;
 void user_move(Server &myServer, Board &board) {
 	myServer.send_msg("\nYour Move:\nPick a position to place piece [1-f][1-f]: ");
 	string msg = myServer.read_msg();
+	//cout << msg<<endl;
 	board.command(msg); 
 }
 
