@@ -9,15 +9,16 @@ using namespace std;
 
 int main(int argc, char** argv) {
 		Board b;
-		try {
-			//base
-            Server myServer(2323);
-            //string mesg=myServer.read_msg();
-           // cout<<mesg<<endl;
-			cout << b << "\n";
-			return 0;
-		}
-		catch(runtime_error e) {
-			cerr << e.what() << "\n";
-		}
+		b.shell();
+		//~ try {
+			//~ //base
+            //~ Server myServer(2323);
+            //~ //string mesg=myServer.read_msg();
+           //~ // cout<<mesg<<endl;
+			//~ cout << b << "\n";
+			//~ return 0;
+		//~ }
+		//~ catch(runtime_error e) {
+			//~ cerr << e.what() << "\n";
+		//~ }
 }

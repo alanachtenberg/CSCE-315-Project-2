@@ -35,7 +35,7 @@ private:
 	int checkPath(Cell start, int count, Cell::DIRECTION direction);
 	int checkPath(Cell start, Cell::DIRECTION direction);
 
-	void finish(Cell::STATE state);
+	std::string finish(Cell::STATE state);
 
 public:
 //constructors
@@ -56,14 +56,19 @@ public:
 //public APIs
 //----------------------------------------------------------------------
 	Cell::STATE getTurn() { return turn; }
-	void placePiece(int x, int y);
+	std::string placePiece(int x, int y);
 
-	void undo();
-	void redo();
+	std::string undo();
+	std::string redo();
 
-	bool command(std::string cmd);
+	std::string command(std::string cmd);
+
 	void shell() {
-		while(true) std::cin >> *this;
+		while(true) {
+			std::string cmd;
+			std::cin >> cmd;
+			std::cout << this->command(cmd);
+		}
 	}
 
 	//print out board's current state
