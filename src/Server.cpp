@@ -6,9 +6,15 @@
     Server::Server(int port_num){
     open_port_fd=0;
     client_port_fd=0;
+    memset(&client_addr, 0, sizeof(client_addr));
+    memset(&server_addr, 0, sizeof (server_addr));//initialize all structs to 0
+
     buffer= (char*)malloc(sizeof(char)*SOCKET_BUF_SIZE);
 
-    open_port_fd = socket(AF_INET, SOCK_STREAM, 0);// initializes socket of IP type and of reliable connection
+    if((open_port_fd = socket(AF_INET, SOCK_STREAM, 0))<0)// initializes socket of IP type and of reliable connection
+        cout<<"ERROR CREATING SOCKET\n";
+    bool yes=true;
+    setsockopt(open_port_fd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)); //sets option on socket api that allows kernel to reuse sockets that are still in memory
 
     server_addr.sin_family = AF_INET; //AF_INET is the family of ip address, for our case an IPV4 address
     //sets server_addr to
@@ -22,9 +28,9 @@
         perror("listen");
         exit(1);
     }
-
-    socklen_t client_addr_size= sizeof(client_addr);
+    socklen_t client_addr_size=sizeof(client_addr);
     client_port_fd = accept(open_port_fd, (struct sockaddr*)&client_addr,&client_addr_size); //completes connection with client
+
     if (client_port_fd==-1)
         cout<<"ERROR IN ACCEPT\n";
     string msg="---------\nHello you have connected to the 5 in a row server\n---------\n";
