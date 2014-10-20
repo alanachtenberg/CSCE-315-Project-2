@@ -33,7 +33,6 @@ Server::Server(int port_num) {
         cout<<"ERROR IN ACCEPT\n";
     string msg="---------\nHello you have connected to the 5 in a row server\n---------\n";
     send(client_port_fd, msg.c_str(), msg.size(), 0);//0 means no flags
-    board = Board();
 }
 
 Server::~Server() {

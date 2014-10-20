@@ -7,10 +7,10 @@
 #include "Server.h"
 using namespace std;
 
-void user_move(Server &myServer, &Board board) {
-	myServer.send_msg("\nPick a position to place piece [1-f][1-f]: ")
+void user_move(Server &myServer, Board &board) {
+	myServer.send_msg("\nYour Move:\nPick a position to place piece [1-f][1-f]: ");
 	string msg = myServer.read_msg();
-	board >> msg; 
+	board.command(msg); 
 }
 
 void run() { //send the board to and ask for a command
@@ -20,9 +20,9 @@ void run() { //send the board to and ask for a command
 	Board board;
    	Server myServer(2323);
    	while(true){ //win condition
-   		myServer.send_msg(get_string_board(board));
+   		myServer.send_msg(board.get_string_board(board));
    		user_move(myServer, board);
-   		myServer.send_msg(get_string_board(board));
+   		myServer.send_msg(board.get_string_board(board));
    		//Insert AI MOVE function here
    	}
 
@@ -33,10 +33,11 @@ void run() { //send the board to and ask for a command
 
 int main(int argc, char** argv) {
 		Board b;
+		
 		try {
 			//base
             //string mesg=myServer.read_msg();
-            myServer.run();
+            run();
            // cout<<mesg<<endl;
 			
 			return 0;

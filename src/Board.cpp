@@ -1,6 +1,7 @@
 #include <iomanip>
 #include <exception>
 #include <stdexcept>
+#include <string>
 #include <sstream>
 #include "Board.h"
 
@@ -260,11 +261,6 @@ bool Board::command(std::string cmd) {
 	return true;
 }
 
-string Board::get_string_board(Board &board) {
-	stringstream board_ss;
-	board_ss<<board;
-	return board_ss.str();
-}
 
 ostream& operator<<(ostream &out, Board &board) {
 
@@ -286,6 +282,13 @@ ostream& operator<<(ostream &out, Board &board) {
 
 	return out;
 }
+
+string Board::get_string_board(Board& board) {
+	stringstream board_ss;
+	board_ss<<board;
+	return board_ss.str();
+}
+
 
 istream& operator>>(istream &in, Board &board) {
 	std::string cmd;
