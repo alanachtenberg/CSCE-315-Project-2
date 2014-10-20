@@ -34,6 +34,7 @@
     Server::~Server(){
         close(client_port_fd);//close client connection
         close(open_port_fd);//closes open port
+        delete buffer;
     }
 
     void Server::send_msg(string s){
