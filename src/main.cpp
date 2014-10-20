@@ -24,6 +24,7 @@ void run() { //send the board to and ask for a command
    		user_move(myServer, board);
    		myServer.send_msg(board.get_string_board(board));
    		//Insert AI MOVE function here
+   		board.random_ai();
    	}
 
 

@@ -72,6 +72,8 @@ public:
 		}
 	}
 
+	void random_ai();
+
 	//print out board's current state
 	friend std::ostream& operator<<(std::ostream &out, Board &board);
 	std::string get_string_board(Board& board);
