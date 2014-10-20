@@ -4,18 +4,20 @@
 #include <stdexcept>
 #include <unistd.h>
 #include "Board.h"
-
+#include "Server.h"
 using namespace std;
 
 int main(int argc, char** argv) {
-	Board b;
-	b.shell();
-
-	//~ Timer timer;
-	//~ timer.start();
-	//~ usleep(60000001);
-	//~ timer.finish();
-	//~ cout << "\n" << timer << "\n";
-
-	return 0;
+		Board b;
+		try {
+			//base
+            Server myServer(2323);
+            //string mesg=myServer.read_msg();
+           // cout<<mesg<<endl;
+			cout << b << "\n";
+			return 0;
+		}
+		catch(runtime_error e) {
+			cerr << e.what() << "\n";
+		}
 }
