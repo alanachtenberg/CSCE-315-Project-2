@@ -20,10 +20,13 @@ Cell Board::getCell(int x, int y) {
 	}
 }
 
-void Board::placePiece(int x, int y) {
+string Board::placePiece(int x, int y) {
 	Cell cell;
 	cell.setState(turn);
 	cell.setPosition(x, y);
+
+	stringstream out;
+
 	switch(isMoveValid(cell)) {
 	case 0:
 		//set cell to current piece
@@ -36,8 +39,8 @@ void Board::placePiece(int x, int y) {
 			moves++;
 			turn = Cell::WHITE;
 		}
-		if(display) cout << *this;
-		break;
+		if(display) out << *this;
+		return out.str();
 	case 1:
 		//set cell to current piece
 		cells[x-1][y-1] = cell;
@@ -47,19 +50,19 @@ void Board::placePiece(int x, int y) {
 		else {
 			moves++;
 		}
-		if(display) cout << *this;
+		if(display) out << *this;
 
-		finish(turn);
-		break;
+		out << finish(turn);
+		return out.str();
 	case 2:
-		cout << "Position (" << x << ", " << y << ") already taken\n";
-		break;
+		out << "Position (" << x << ", " << y << ") already taken\n";
+		return out.str();
 	case 3:
-		cout << "Cannot place a piece that would simultaneously form multiple open rows of three\n";
-		break;
+		out << "Cannot place a piece that would simultaneously form multiple open rows of three\n";
+		return out.str();
 	case 4:
-		cout << "Cannot place an empty piece\n";
-		break;
+		out << "Cannot place an empty piece\n";
+		return out.str();
 	}
 }
 
@@ -195,20 +198,22 @@ int Board::isMoveValid(Cell cell) {
 	return 0;
 }
 
-void Board::finish(Cell::STATE state) {
+string Board::finish(Cell::STATE state) {
 	timer.finish();
 
-	if(state == Cell::BLACK) cout << "Black ";
-	else cout << "White ";
+	stringstream out;
 
-	cout << "player has won the game!\n";
-	cout << "***STATS***\n";
-	cout << "Game Time: " << timer << "\n";
-	cout << "Moves: " << moves << "\n";
-	exit(0);
+	if(state == Cell::BLACK) out << "Black ";
+	else out << "White ";
+
+	out << "player has won the game!\n";
+	out << "***STATS***\n";
+	out << "Game Time: " << timer << "\n";
+	out << "Moves: " << moves << "\n";
+	return out.str();
 }
 
-void Board::undo() {
+string Board::undo() {
 	if(game_history.size() > 0) {
 		Cell cell = game_history.top();
 		game_history.pop();
@@ -216,13 +221,14 @@ void Board::undo() {
 
 		turn = (turn == Cell::WHITE) ? turn = Cell::BLACK : turn = Cell::WHITE;
 		undo_history.push(cell);
+		return "";
 	}
 	else {
-		cout << "No moves to undo\n";
+		return "No moves to undo\n";
 	}
 }
 
-void Board::redo() {
+string Board::redo() {
 	if(game_history.size() > 0) {
 		Cell cell = undo_history.top();
 		undo_history.pop();
@@ -230,13 +236,14 @@ void Board::redo() {
 
 		turn = (turn == Cell::WHITE) ? turn = Cell::BLACK : turn = Cell::WHITE;
 		game_history.push(cell);
+		return "";
 	}
 	else {
 		cout << "No moves to redo\n";
 	}
 }
 
-bool Board::command(std::string cmd) {
+string Board::command(std::string cmd) {
 	//we have a comment, ignore rest of line
 	if(cmd.at(0) == ';') ;
 	//we have a move
@@ -250,15 +257,15 @@ bool Board::command(std::string cmd) {
 		ss << x_char << " " << y_char;
 		ss >> hex >> x;
 		ss >> hex >> y;
-		placePiece(x, y);
+		return placePiece(x, y);
 	}
-	else if(cmd == "UNDO") undo();
-	else if(cmd == "REDO") redo();
+	else if(cmd == "UNDO") return undo();
+	else if(cmd == "REDO") return redo();
 	else if(cmd == "EXIT") exit(0);
 	else if(cmd == "DISPLAY") display = (display) ? false : true;
-	else return false;
+	else return "";
 
-	return true;
+	return "";
 }
 
 
@@ -298,4 +305,6 @@ istream& operator>>(istream &in, Board &board) {
 		cmd = ";" + cmd;
 	}
 	board.command(cmd);
+
+	return in;
 }

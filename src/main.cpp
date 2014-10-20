@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
             //string mesg=myServer.read_msg();
             run();
            // cout<<mesg<<endl;
-			
+
 			return 0;
 		}
 		catch(runtime_error e) {
