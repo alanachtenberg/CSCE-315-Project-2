@@ -1,7 +1,7 @@
-main: main.cpp Board.o Player.o Cell.o
+main: main.cpp Board.o Player.o Cell.o Server.o
      g++ -std=c++11 main.cpp Board.o Player.o Cell.o
 
-Board.o: Board.cpp Board.h Cell.h Player.h
+Board.o: Board.cpp Board.h Cell.h Player.h Server.h
 	g++ -std=c++11 -c Board.cpp
 
 Cell.o: Cell.cpp Cell.h
