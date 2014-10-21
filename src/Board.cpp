@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include <iomanip>
 #include <exception>
 #include <stdexcept>
@@ -55,14 +57,14 @@ string Board::placePiece(int x, int y) {
 		out << finish(turn);
 		return out.str();
 	case 2:
-		out << "Position (" << x << ", " << y << ") already taken\n";
-		return out.str();
+		error_message = "Position already taken\n";
+		return "ERROR";
 	case 3:
-		out << "Cannot place a piece that would simultaneously form multiple open rows of three\n";
-		return out.str();
+		error_message = "Cannot place a piece that would simultaneously form multiple open rows of three\n";
+		return "ERROR";
 	case 4:
-		out << "Cannot place an empty piece\n";
-		return out.str();
+		error_message = "Cannot place an empty piece\n";
+		return "ERROR";
 	}
 }
 
@@ -214,13 +216,19 @@ string Board::finish(Cell::STATE state) {
 }
 
 string Board::undo() {
-	if(game_history.size() > 0) {
-		Cell cell = game_history.top();
-		game_history.pop();
+	if(game_history.size() > 1) {
+        Cell cell = game_history.top();//undo AI move
+        cells[cell.getX()-1][cell.getY()-1].setState(Cell::EMPTY);
+        game_history.pop();
+        undo_history.push(cell);//save ai move for redo
+
+        cell = game_history.top();
+		game_history.pop();//undo user move
 		cells[cell.getX()-1][cell.getY()-1].setState(Cell::EMPTY);
 
-		turn = (turn == Cell::WHITE) ? turn = Cell::BLACK : turn = Cell::WHITE;
-		undo_history.push(cell);
+        //In case of undo the turn should not change!
+		//turn = (turn == Cell::WHITE) ? turn = Cell::BLACK : turn = Cell::WHITE;
+		undo_history.push(cell); //save user move for redo
 		return "";
 	}
 	else {
@@ -229,17 +237,22 @@ string Board::undo() {
 }
 
 string Board::redo() {
-	if(game_history.size() > 0) {
-		Cell cell = undo_history.top();
+	if(undo_history.size() > 1) {
+		Cell cell = undo_history.top(); //redo user move
 		undo_history.pop();
 		cells[cell.getX()-1][cell.getY()-1].setState(cell.getState());
+        game_history.push(cell);
 
-		turn = (turn == Cell::WHITE) ? turn = Cell::BLACK : turn = Cell::WHITE;
+        cell = undo_history.top(); //redo AI move
+		undo_history.pop();
+		cells[cell.getX()-1][cell.getY()-1].setState(cell.getState());
+		//turn should not change because redo both moves
+	//	turn = (turn == Cell::WHITE) ? turn = Cell::BLACK : turn = Cell::WHITE;
 		game_history.push(cell);
 		return "";
 	}
 	else {
-		cout << "No moves to redo\n";
+		return "No moves to redo\n";//return instead of cout
 	}
 }
 
@@ -247,7 +260,12 @@ string Board::command(std::string cmd) {
 	//we have a comment, ignore rest of line
 	if(cmd.at(0) == ';') ;
 	//we have a move
-	else if(cmd.size() == 2) {
+	else{
+	 if(cmd == "UNDO") return undo();
+	else if(cmd == "REDO") return redo();
+	else if(cmd == "EXIT") exit(0);
+	else if(cmd == "DISPLAY") display = (display) ? false : true;
+	else if (cmd.size()==2){
 		char x_char, y_char;
 		x_char = cmd.at(0);
 		y_char = cmd.at(1);
@@ -257,13 +275,17 @@ string Board::command(std::string cmd) {
 		ss << x_char << " " << y_char;
 		ss >> hex >> x;
 		ss >> hex >> y;
+		if ((x>16||x<1)  || (y<1||y>16)){
+            error_message= "ERROR OUT OF RANGE\n";
+            return "ERROR";
+        }
 		return placePiece(x, y);
 	}
-	else if(cmd == "UNDO") return undo();
-	else if(cmd == "REDO") return redo();
-	else if(cmd == "EXIT") exit(0);
-	else if(cmd == "DISPLAY") display = (display) ? false : true;
-	else return "";
+	else{
+    error_message="INVALID COMMAND\n";
+	return "ERROR";
+	}
+	}
 
 	return "";
 }
@@ -271,7 +293,7 @@ string Board::command(std::string cmd) {
 //--------------------------------
 
 void Board::random_ai(){
-	Cell cell = game_history.top();
+    Cell cell = game_history.top();
 
 	bool moved = false;								// used for while loop determining where to move
 
@@ -285,10 +307,10 @@ void Board::random_ai(){
 	dirs[6] = checkPath(cell, Cell::W);
 	dirs[7] = checkPath(cell, Cell::NW);
 
-	int N_to_S = dirs[0] + dirs[4];
-	int NE_to_SW = dirs[1] + dirs[5];
-	int E_to_W = dirs[2] + dirs[6];
-	int SE_to_NW = dirs[3] + dirs[7];
+	int N_to_S = dirs[0] + dirs[4]-1;// minus 1 because middle vaule is counted twice
+	int NE_to_SW = dirs[1] + dirs[5]-1;
+	int E_to_W = dirs[2] + dirs[6]-1;
+	int SE_to_NW = dirs[3] + dirs[7]-1;
 	int random_X;									// In case AI makes random move we will need this
 	int random_Y;									// In case AI makes random move we will need this
 
@@ -300,7 +322,7 @@ void Board::random_ai(){
 			moved = true;
 		}
 		// if S can be covered cover
-		if(getCell(cell.getX(), cell.getY() + dirs[4]).getState() == Cell::EMPTY){
+		else if(getCell(cell.getX(), cell.getY() + dirs[4]).getState() == Cell::EMPTY){
 			placePiece(cell.getX(), cell.getY() + dirs[4]);
 			moved = true;
 		}
@@ -312,7 +334,7 @@ void Board::random_ai(){
 			moved = true;
 		}
 		// if SW can be covered cover
-		if(getCell(cell.getX() - dirs[5], cell.getY() + dirs[5]).getState() == Cell::EMPTY){
+		else if(getCell(cell.getX() - dirs[5], cell.getY() + dirs[5]).getState() == Cell::EMPTY){
 			placePiece(cell.getX() - dirs[5], cell.getY() + dirs[5]);
 			moved = true;
 		}
@@ -324,7 +346,7 @@ void Board::random_ai(){
 			moved = true;
 		}
 		// if W can be covered cover
-		if(getCell(cell.getX() - dirs[6], cell.getY()).getState() == Cell::EMPTY){
+		else if(getCell(cell.getX() - dirs[6], cell.getY()).getState() == Cell::EMPTY){
 			placePiece(cell.getX() - dirs[6], cell.getY());
 			moved = true;
 		}
@@ -336,20 +358,21 @@ void Board::random_ai(){
 			moved = true;
 		}
 		// if NW can be covered cover
-		if(getCell(cell.getX() - dirs[7], cell.getY() - dirs[6]).getState() == Cell::EMPTY){
+		else if(getCell(cell.getX() - dirs[7], cell.getY() - dirs[6]).getState() == Cell::EMPTY){
 			placePiece(cell.getX() - dirs[7], cell.getY() - dirs[6]);
 			moved = true;
 		}
 	}
 
 	while(!moved){				// If no obvious moves or cant cover  make random move
-		random_X = 1 + rand() % 15;		// create a random number from 1 - 15 for X 
+		random_X = 1 + rand() % 15;		// create a random number from 1 - 15 for X
 		random_Y = 1 + rand() % 15;		// create a random number from 1 - 15 for Y
 		if(getCell(random_X, random_Y).getState() == Cell::EMPTY){
 			placePiece(random_X, random_Y);
 			moved = true;
 		}
 	}
+
 }
 
 //--------------------------------

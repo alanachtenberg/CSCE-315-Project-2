@@ -53,10 +53,15 @@ void Server::send_msg(string s) {
 }
 
 string Server::read_msg() {
+    string msg;
     if(recv(client_port_fd, buffer, SOCKET_BUF_SIZE,0)<0)
         cout<<"ERROR READING MESSAGE\n";
-    else
-        return string(buffer);
+    else{
+        msg= string(buffer);
+        msg.replace(msg.end()-2,msg.end(),"");
+        memset(buffer,0,SOCKET_BUF_SIZE);//clear buffer
+        return msg;
+        }
     return string("error");
 }
 

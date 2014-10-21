@@ -39,6 +39,7 @@ private:
 	std::string finish(Cell::STATE state);
 
 public:
+    std::string error_message;
 //constructors
 //----------------------------------------------------------------------
 	Board() {
