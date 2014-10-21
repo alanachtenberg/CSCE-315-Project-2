@@ -262,7 +262,7 @@ string Board::command(std::string cmd) {
 	else if(cmd == "REDO") return redo();
 	else if(cmd == "EXIT") exit(0);
 	else if(cmd == "DISPLAY") display = (display) ? false : true;
-	else return "";
+	else return "invalid command";
 
 	return "";
 }
@@ -274,7 +274,6 @@ string Board::get_string_board(Board &board) {
 }
 
 ostream& operator<<(ostream &out, Board &board) {
-
 	out << "  ";
 	for(int i = 1; i < 16; i++) {
 		out << hex << i << " ";
