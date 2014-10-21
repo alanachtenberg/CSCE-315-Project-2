@@ -1,0 +1,23 @@
+DEVLOG
+
+CSCE 315
+PROJECT 2
+5 In a Row
+
+Alan Achtenberg
+Jacob Stone
+Robby Grathwohl
+Casey Brooks
+
+SEE BACKLOG FOR TASKS ID's info, ID's are of the form #.#
+
+10/15 casey implemented task 1.1 1.2 1.3 1.4 1.5 and 1.6
+10/17 casey implemented task 1.7 and 1.9
+
+10/18 alan implemented task 2.1
+10/19 alan implemented task 2.2 and 2.3
+
+10/20 jacob implemented task 3.1
+10/20 robby implemented task 2.5 2.6 2.7
+10/20 casey implemented task 2.4
+10/20 alan updated backlog, burndown chart and dev log
