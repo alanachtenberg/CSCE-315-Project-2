@@ -18,5 +18,5 @@ Compilation Instructions
 
 Turn-Ins
 =========================
-This weeks backlog is saved in the file 'SCRUM backlog week 1.xlsb'
-This weeks burndown chart is saved in the file "SCRUM burndown chart week 1.xlsb'
+This weeks backlog is saved in the file 'SCRUM backlog week 1.xlsb'.
+This weeks burndown chart is saved in the file "SCRUM burndown chart week 1.xlsb'.
