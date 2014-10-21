@@ -33,7 +33,6 @@ Server::Server(int port_num) {
         cout<<"ERROR IN ACCEPT\n";
     string msg="---------\nHello you have connected to the 5 in a row server\n---------\n";
     send(client_port_fd, msg.c_str(), msg.size(), 0);//0 means no flags
-    board = Board();
 }
 
 Server::~Server() {
@@ -54,10 +53,15 @@ void Server::send_msg(string s) {
 }
 
 string Server::read_msg() {
+    string msg;
     if(recv(client_port_fd, buffer, SOCKET_BUF_SIZE,0)<0)
         cout<<"ERROR READING MESSAGE\n";
-    else
-        return string(buffer);
+    else{
+        msg= string(buffer);
+        msg.replace(msg.end()-2,msg.end(),"");
+        memset(buffer,0,SOCKET_BUF_SIZE);//clear buffer
+        return msg;
+        }
     return string("error");
 }
 

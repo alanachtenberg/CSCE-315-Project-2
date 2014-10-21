@@ -7,10 +7,24 @@
 #include "Server.h"
 using namespace std;
 
-void user_move(Server &myServer, &Board board) {
-	myServer.send_msg("\nPick a position to place piece [1-f][1-f]: ")
-	string msg = myServer.read_msg();
-	board >> msg;
+string user_move(Server &myServer, Board &board) {
+	while (1){
+        myServer.send_msg("\nYour Move:\nPick a position to place piece [1-f][1-f]: ");
+        string msg = myServer.read_msg();
+        string resp= board.command(msg);
+        if(msg=="UNDO"||msg=="REDO"||msg=="DISPLAY"){
+            myServer.send_msg(resp);
+            myServer.send_msg(board.get_string_board(board));
+        }
+        else
+        {
+            if (resp!="ERROR")
+                return resp;
+            else
+                myServer.send_msg(board.error_message);
+        }
+    }
+
 }
 
 void run() { //send the board to and ask for a command
@@ -20,10 +34,11 @@ void run() { //send the board to and ask for a command
 	Board board;
    	Server myServer(2323);
    	while(true){ //win condition
-   		myServer.send_msg(get_string_board(board));
-   		user_move(myServer, board);
-   		myServer.send_msg(get_string_board(board));
+   		myServer.send_msg(board.get_string_board(board));
+   		string server_mesg=user_move(myServer, board);
+   		myServer.send_msg(server_mesg);
    		//Insert AI MOVE function here
+   		board.random_ai();
    	}
 
 
@@ -33,10 +48,11 @@ void run() { //send the board to and ask for a command
 
 int main(int argc, char** argv) {
 		Board b;
+
 		try {
 			//base
             //string mesg=myServer.read_msg();
-            myServer.run();
+            run();
            // cout<<mesg<<endl;
 
 			return 0;

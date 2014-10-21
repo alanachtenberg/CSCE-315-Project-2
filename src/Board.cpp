@@ -1,6 +1,9 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include <iomanip>
 #include <exception>
 #include <stdexcept>
+#include <string>
 #include <sstream>
 #include "Board.h"
 
@@ -54,14 +57,14 @@ string Board::placePiece(int x, int y) {
 		out << finish(turn);
 		return out.str();
 	case 2:
-		out << "Position (" << x << ", " << y << ") already taken\n";
-		return out.str();
+		error_message = "Position already taken\n";
+		return "ERROR";
 	case 3:
-		out << "Cannot place a piece that would simultaneously form multiple open rows of three\n";
-		return out.str();
+		error_message = "Cannot place a piece that would simultaneously form multiple open rows of three\n";
+		return "ERROR";
 	case 4:
-		out << "Cannot place an empty piece\n";
-		return out.str();
+		error_message = "Cannot place an empty piece\n";
+		return "ERROR";
 	}
 }
 
@@ -213,13 +216,19 @@ string Board::finish(Cell::STATE state) {
 }
 
 string Board::undo() {
-	if(game_history.size() > 0) {
-		Cell cell = game_history.top();
-		game_history.pop();
+	if(game_history.size() > 1) {
+        Cell cell = game_history.top();//undo AI move
+        cells[cell.getX()-1][cell.getY()-1].setState(Cell::EMPTY);
+        game_history.pop();
+        undo_history.push(cell);//save ai move for redo
+
+        cell = game_history.top();
+		game_history.pop();//undo user move
 		cells[cell.getX()-1][cell.getY()-1].setState(Cell::EMPTY);
 
-		turn = (turn == Cell::WHITE) ? turn = Cell::BLACK : turn = Cell::WHITE;
-		undo_history.push(cell);
+        //In case of undo the turn should not change!
+		//turn = (turn == Cell::WHITE) ? turn = Cell::BLACK : turn = Cell::WHITE;
+		undo_history.push(cell); //save user move for redo
 		return "";
 	}
 	else {
@@ -228,17 +237,22 @@ string Board::undo() {
 }
 
 string Board::redo() {
-	if(game_history.size() > 0) {
-		Cell cell = undo_history.top();
+	if(undo_history.size() > 1) {
+		Cell cell = undo_history.top(); //redo user move
 		undo_history.pop();
 		cells[cell.getX()-1][cell.getY()-1].setState(cell.getState());
+        game_history.push(cell);
 
-		turn = (turn == Cell::WHITE) ? turn = Cell::BLACK : turn = Cell::WHITE;
+        cell = undo_history.top(); //redo AI move
+		undo_history.pop();
+		cells[cell.getX()-1][cell.getY()-1].setState(cell.getState());
+		//turn should not change because redo both moves
+	//	turn = (turn == Cell::WHITE) ? turn = Cell::BLACK : turn = Cell::WHITE;
 		game_history.push(cell);
 		return "";
 	}
 	else {
-		cout << "No moves to redo\n";
+		return "No moves to redo\n";//return instead of cout
 	}
 }
 
@@ -246,32 +260,123 @@ string Board::command(std::string cmd) {
 	//we have a comment, ignore rest of line
 	if(cmd.at(0) == ';') ;
 	//we have a move
-	else if(cmd.size() == 2) {
-		char x_char, y_char;
-		x_char = cmd.at(0);
-		y_char = cmd.at(1);
+	else {
+		if(cmd == "UNDO") return undo();
+		else if(cmd == "REDO") return redo();
+		else if(cmd == "EXIT") exit(0);
+		else if(cmd == "DISPLAY") display = (display) ? false : true;
+		else if (cmd.size()==2){
+			char x_char, y_char;
+			x_char = cmd.at(0);
+			y_char = cmd.at(1);
 
-		int x, y;
-		std::stringstream ss;
-		ss << x_char << " " << y_char;
-		ss >> hex >> x;
-		ss >> hex >> y;
-		return placePiece(x, y);
+			int x, y;
+			std::stringstream ss;
+			ss << x_char << " " << y_char;
+			ss >> hex >> x;
+			ss >> hex >> y;
+			if ((x>16||x<1)  || (y<1||y>16)){
+				error_message= "ERROR OUT OF RANGE\n";
+				return "ERROR";
+			}
+			return placePiece(x, y);
+		}
+		else{
+			error_message="INVALID COMMAND\n";
+			return "ERROR";
+		}
 	}
-	else if(cmd == "UNDO") return undo();
-	else if(cmd == "REDO") return redo();
-	else if(cmd == "EXIT") exit(0);
-	else if(cmd == "DISPLAY") display = (display) ? false : true;
-	else return "invalid command";
 
 	return "";
 }
+//--------------------------------
+//--------------------------------
 
-string Board::get_string_board(Board &board) {
-	stringstream board_ss;
-	board_ss<<board;
-	return board_ss.str();
+void Board::random_ai(){
+    Cell cell = game_history.top();
+
+	bool moved = false;								// used for while loop determining where to move
+
+	int dirs[8];
+	dirs[0] = checkPath(cell, Cell::N);
+	dirs[1] = checkPath(cell, Cell::NE);
+	dirs[2] = checkPath(cell, Cell::E);
+	dirs[3] = checkPath(cell, Cell::SE);
+	dirs[4] = checkPath(cell, Cell::S);
+	dirs[5] = checkPath(cell, Cell::SW);
+	dirs[6] = checkPath(cell, Cell::W);
+	dirs[7] = checkPath(cell, Cell::NW);
+
+	int N_to_S = dirs[0] + dirs[4]-1;// minus 1 because middle vaule is counted twice
+	int NE_to_SW = dirs[1] + dirs[5]-1;
+	int E_to_W = dirs[2] + dirs[6]-1;
+	int SE_to_NW = dirs[3] + dirs[7]-1;
+	int random_X;									// In case AI makes random move we will need this
+	int random_Y;									// In case AI makes random move we will need this
+
+
+	if(N_to_S >= 3){
+		// if N can be covered cover
+		if(getCell(cell.getX(), cell.getY() - dirs[0]).getState() == Cell::EMPTY){
+			placePiece(cell.getX(), cell.getY() - dirs[0]);
+			moved = true;
+		}
+		// if S can be covered cover
+		else if(getCell(cell.getX(), cell.getY() + dirs[4]).getState() == Cell::EMPTY){
+			placePiece(cell.getX(), cell.getY() + dirs[4]);
+			moved = true;
+		}
+	}
+	else if(NE_to_SW >= 3){
+		// if NE can be covered cover
+		if(getCell(cell.getX() + dirs[1], cell.getY() - dirs[1]).getState() == Cell::EMPTY){
+			placePiece(cell.getX() + dirs[1], cell.getY() - dirs[1]);
+			moved = true;
+		}
+		// if SW can be covered cover
+		else if(getCell(cell.getX() - dirs[5], cell.getY() + dirs[5]).getState() == Cell::EMPTY){
+			placePiece(cell.getX() - dirs[5], cell.getY() + dirs[5]);
+			moved = true;
+		}
+	}
+	else if(E_to_W >= 3){
+		// if E can be covered cover
+		if(getCell(cell.getX() + dirs[2], cell.getY()).getState() == Cell::EMPTY){
+			placePiece(cell.getX() + dirs[2], cell.getY());
+			moved = true;
+		}
+		// if W can be covered cover
+		else if(getCell(cell.getX() - dirs[6], cell.getY()).getState() == Cell::EMPTY){
+			placePiece(cell.getX() - dirs[6], cell.getY());
+			moved = true;
+		}
+	}
+	else if(SE_to_NW >= 3){
+		// if SE can be covered cover
+		if(getCell(cell.getX() + dirs[3], cell.getY() + dirs[3]).getState() == Cell::EMPTY){
+			placePiece(cell.getX() + dirs[3], cell.getY() + dirs[3]);
+			moved = true;
+		}
+		// if NW can be covered cover
+		else if(getCell(cell.getX() - dirs[7], cell.getY() - dirs[6]).getState() == Cell::EMPTY){
+			placePiece(cell.getX() - dirs[7], cell.getY() - dirs[6]);
+			moved = true;
+		}
+	}
+
+	while(!moved){				// If no obvious moves or cant cover  make random move
+		random_X = 1 + rand() % 15;		// create a random number from 1 - 15 for X
+		random_Y = 1 + rand() % 15;		// create a random number from 1 - 15 for Y
+		if(getCell(random_X, random_Y).getState() == Cell::EMPTY){
+			placePiece(random_X, random_Y);
+			moved = true;
+		}
+	}
+
 }
+
+//--------------------------------
+//--------------------------------
 
 ostream& operator<<(ostream &out, Board &board) {
 	out << "  ";
@@ -292,6 +397,13 @@ ostream& operator<<(ostream &out, Board &board) {
 
 	return out;
 }
+
+string Board::get_string_board(Board& board) {
+	stringstream board_ss;
+	board_ss<<board;
+	return board_ss.str();
+}
+
 
 istream& operator>>(istream &in, Board &board) {
 	std::string cmd;
