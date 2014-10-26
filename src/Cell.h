@@ -1,3 +1,6 @@
+#ifndef CELL_H
+#define CELL_H
+
 #include <iostream>
 
 class Cell {
@@ -22,3 +25,5 @@ public:
 
 	friend std::ostream& operator<<(std::ostream &out, Cell &cell);
 };
+
+#endif

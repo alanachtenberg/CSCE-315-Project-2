@@ -1,3 +1,7 @@
+
+#ifndef TIMER_H
+#define TIMER_H
+
 #include <sys/time.h>
 #include <assert.h>
 #include <iomanip>
@@ -51,3 +55,5 @@ public:
 		return out;
 	}
 };
+
+#endif

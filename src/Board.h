@@ -1,3 +1,6 @@
+#ifndef BOARD_H
+#define BOARD_H
+
 #include <stack>
 #include <iomanip>
 #include <cstdlib>
@@ -81,3 +84,5 @@ public:
 	//read into the board from a stream
 	friend std::istream& operator>>(std::istream &in, Board &board);
 };
+
+#endif
