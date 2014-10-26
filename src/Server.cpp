@@ -58,7 +58,7 @@ string Server::read_msg() {
         cout<<"ERROR READING MESSAGE\n";
     else{
         msg= string(buffer);
-        msg.replace(msg.end()-2,msg.end(),"");
+        msg.replace(msg.end()-2,msg.end(),"");//replaces the newline char and return char with nothing
         memset(buffer,0,SOCKET_BUF_SIZE);//clear buffer
         return msg;
         }
