@@ -3,12 +3,10 @@
 
 #define MINMAX_DEPTH 5
 #define ALPHABETA_DEPTH 8
-
 #include "Board.h"
 #include <vector>
 using namespace std;
 
-class Board; //FOWARD DECLARATION OF BOARD
 
 class Player {
 public:

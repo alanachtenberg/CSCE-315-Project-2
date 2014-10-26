@@ -7,7 +7,6 @@
 #include <sstream>
 #include <string>
 #include "Cell.h"
-#include "Player.h"
 #include "Timer.h"
 
 class Board {
@@ -21,7 +20,7 @@ private:
 	std::stack<Cell> game_history, undo_history;
 
 	//2 players only
-	Player black, white;
+	//Player black, white; removed to avoid foward declaring board in player.h, player is determined by member turn anyway
 	int moves;
 
 	bool display;
