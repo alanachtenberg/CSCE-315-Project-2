@@ -24,7 +24,7 @@ private:
     vector<int> calc_ab_pruning(Board board);// returns a move determined using alpha beta pruning, HARD AI
 
     int minimax(Board board, int depth, bool max_player_turn);
-    int ab_pruning(Board board, int depth,int alpha, int beta, Cell::STATE max_player);
+    int ab_pruning(Board board, int depth,int alpha, int beta,bool max_player_turn);
 public:
 
 
