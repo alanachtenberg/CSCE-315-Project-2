@@ -379,22 +379,27 @@ void Board::random_ai(){
 }
 
 bool Board::is_adjacent(Board& board, Cell cell){//checks if cell is adjacent
-        std::vector<Cell> adjacent_cells;
         int x=cell.getX();
         int y=cell.getY();
-
-        adjacent_cells.push_back(board.getCell(x,y-1));    //N cell
-        adjacent_cells.push_back(board.getCell(x-1,y-1));   //NW cell
-        adjacent_cells.push_back(board.getCell(x+1,y-1));   //NE cell
-        adjacent_cells.push_back(board.getCell(x,y+1));     //S cell
-        adjacent_cells.push_back(board.getCell(x-1,y+1));   //SW cell
-        adjacent_cells.push_back(board.getCell(x+1,y+1));   //SE cell
-        adjacent_cells.push_back(board.getCell(x-1,y));     //W cell
-        adjacent_cells.push_back(board.getCell(x+1,y));     //E cell
-
-        for (unsigned int i=0;i<adjacent_cells.size();++i)//check if cells are occupied
-            if (adjacent_cells[i].getState()!=Cell::OFF_BOARD && adjacent_cells[i].getState()!=cell.EMPTY)
-                return true;
+        Cell::STATE temp;
+        //removed vector implementation
+        //used these ridiculous if statements to improve the efficiency
+        if ((temp=board.getCell(x,y-1).getState())!=Cell::EMPTY && temp!=Cell::OFF_BOARD);    //N cell
+            return true;
+        if ((temp=board.getCell(x-1,y-1).getState())!=Cell::EMPTY && temp!=Cell::OFF_BOARD);    //NW cell
+            return true;
+        if ((temp=board.getCell(x+1,y-1).getState())!=Cell::EMPTY && temp!=Cell::OFF_BOARD);    //NE cell
+            return true;
+        if ((temp=board.getCell(x,y+1).getState())!=Cell::EMPTY && temp!=Cell::OFF_BOARD);    //S cell
+            return true;
+        if ((temp=board.getCell(x-1,y+1).getState())!=Cell::EMPTY && temp!=Cell::OFF_BOARD);    //SW cell
+            return true;
+        if ((temp=board.getCell(x+1,y+1).getState())!=Cell::EMPTY && temp!=Cell::OFF_BOARD);    //SE cell
+            return true;
+        if ((temp=board.getCell(x-1,y).getState())!=Cell::EMPTY && temp!=Cell::OFF_BOARD);    //W cell
+            return true;
+        if ((temp=board.getCell(x+1,y).getState())!=Cell::EMPTY && temp!=Cell::OFF_BOARD);    //E cell
+            return true;
         return false;
 
 }
@@ -405,14 +410,15 @@ bool Board::is_adjacent(Board& board, Cell cell){//checks if cell is adjacent
     std::vector<Cell> adj_moves; //determine adjacent moves first
     for (int i=0; i<15;++i)
         for (int j=0; j<15; ++j){
-            if (board.getCell(i,j).getState()!=Cell::EMPTY);//ignore cells that are not empty
+            if (board.getCell(i,j).getState()==Cell::EMPTY);//ignore cells that are not empty
                 if (is_adjacent(board, board.getCell(i,j))) //check  if adjacent
                     adj_moves.push_back(board.getCell(i,j)); // save cell
         }
 
     std::vector<Cell> valid_moves; //create new list of valid moves from adjacent moves
     for (unsigned int k=0; k<adj_moves.size();++k){
-        if(isMoveValid(adj_moves[k].setState(getTurn()))==0)
+        int val=isMoveValid(adj_moves[k].setState(getTurn()));
+        if(val==0||val==1)
             valid_moves.push_back(adj_moves[k]);
     }
 
