@@ -53,7 +53,7 @@ string Board::placePiece(int x, int y) {
 			moves++;
 		}
 		if(display) out << *this;
-
+        game_won=true;
 		out << finish(turn);
 		return out.str();
 	case 2:
@@ -409,7 +409,7 @@ bool Board::is_adjacent(Board& board, Cell cell){//checks if cell is adjacent
 
     std::vector<Cell> valid_moves; //create new list of valid moves from adjacent moves
     for (unsigned int k=0; k<adj_moves.size();++k){
-        if(isMoveValid(adj_moves[k]))
+        if(isMoveValid(adj_moves[k].setState(getTurn()))==0)
             valid_moves.push_back(adj_moves[k]);
     }
 

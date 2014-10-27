@@ -41,6 +41,7 @@ private:
 	std::string finish(Cell::STATE state);
 
 public:
+    bool game_won=false;
     std::string error_message;
 //constructors
 //----------------------------------------------------------------------

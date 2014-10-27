@@ -3,6 +3,11 @@
     //returns a random move, EASY AI
     vector<int> Player::calc_random(Board board){
         vector<int> move=vector<int>(2);
+        if (board.is_board_empty()){
+            move[0]=rand()%16; //get random x between 0 and 15
+            move[1]=rand()%16; // get random y o and 15
+            return move;
+        }
         Cell cell = board.getGameHistory().top();
 
         bool moved = false;								// used for while loop determining where to move
@@ -82,7 +87,7 @@
             else if(board.getCell(cell.getX() - dirs[7], cell.getY() - dirs[6]).getState() == Cell::EMPTY){
                 //placePiece(cell.getX() - dirs[7], cell.getY() - dirs[6]);
                 move[0]=cell.getX()-dirs[7];//x
-                move[1]=cell.getY()+dirs[6];//y
+                move[1]=cell.getY()-dirs[6];//y
                 moved = true;
             }
         }
@@ -91,6 +96,12 @@
             //random_X = 1 + rand() % 15;		// create a random number from 1 - 15 for X
             //random_Y = 1 + rand() % 15;		// create a random number from 1 - 15 for Y
             vector<Cell> possible_moves=board.get_moves(board);
+            int num_moves=possible_moves.size();
+            if (possible_moves.size()<1){
+                string err="ERR NO POSSSIBLE MOVES\n";
+                cout<<err;
+                throw err;
+            }
             int random_move= rand() % possible_moves.size();//gets random index to pick from possible moves
             move[0]=possible_moves[random_move].getX();
             move[1]=possible_moves[random_move].getY();
@@ -119,7 +130,7 @@
 	Player::Player(MODE md, DIFFICULTY df, Cell::STATE clr){
         mode=md;
         difficulty=df;
-        if(clr!=Cell::BLACK||clr!=Cell::WHITE)
+        if(clr!=Cell::BLACK && clr!=Cell::WHITE)
             cerr<<"ERR! invalid cell state in player constructor\n";
         color=clr;
 	}

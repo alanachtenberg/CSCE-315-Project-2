@@ -17,7 +17,7 @@ public:
 		y = 0;
 	}
 
-	void setState(STATE s) { state = s; }
+	Cell setState(STATE s) { state = s;return *this;}
 	void setPosition(int x_pos, int y_pos) { x = x_pos; y = y_pos; }
 	STATE getState() { return state; }
 	int getX() { return x; }
