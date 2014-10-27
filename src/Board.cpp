@@ -184,7 +184,7 @@ int Board::isMoveValid(Cell cell) {
 
 	//check for winning condition of a row of exactly 5
 	for(int i = 0; i < 4; i++) {
-		if((dirs[i] + dirs[i+4] - 1) >= 5) {
+		if((dirs[i] + dirs[i+4] - 1) == 5) {
 			return 1; //game is over, whover just played has won
 		}
 	}
