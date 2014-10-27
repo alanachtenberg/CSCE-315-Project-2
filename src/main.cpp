@@ -34,10 +34,10 @@ void run() { //send the board to and ask for a command
                         //this happens until an end condition
 	Board board;
 	Player easy_ai_black(Player::AI,Player::MEDIUM,Cell::BLACK);
-	Player easy_ai_white(Player::AI,Player::EASY,Cell::WHITE);
+	Player easy_ai_white(Player::AI,Player::MEDIUM,Cell::WHITE);
 	vector<int> move;
 	string temp;
-	while(!board.game_won && temp!="q"){ //simulate MEDIUM AI vs easy AI
+	while(!board.game_won && temp!="q"){ //simulate MEDIUM AI vs MEDIUM AI
 	move=easy_ai_black.calc_move(board);
 	cout<<board.placePiece(move[0],move[1]);
 	cout<<endl;

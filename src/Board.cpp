@@ -12,7 +12,7 @@ using namespace std;
 //internal helper functions
 //----------------------------------------------------------------------
 Cell Board::getCell(int x, int y) {
-	if(x > 1 && y > 1 && x < 16 && y < 16) {//fixed bug, because were returning cells of x-1 and y-1
+	if(x > 0 && y > 0 && x <= 16 && y <= 16) {
 		return cells[x-1][y-1]; // we must range check greater than 1 instead of 0
 	}
 	else {

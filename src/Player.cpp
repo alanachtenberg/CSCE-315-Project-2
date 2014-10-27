@@ -123,10 +123,9 @@
         int new_max=0;
         int index=0;
 
-        Timer test;
-
+        //Timer test;
         for (unsigned int i=0;i<moves.size();++i){
-            test.start();
+            //test.start();
             Board new_board=board;
             //NOTE placeValidatedPiece is an optimized place piece for when the piece has already been validated
             new_board.placeValidatedPiece(moves[i].getX(),moves[i].getY());//update board to new node
@@ -135,11 +134,9 @@
                 max=new_max;
                 index=i;
             }
-            test.finish();
-            cout<<"TIMER SEC VAL "<<test.sec()<<" "<<"USEC VAL "<<test.usec()<<endl;
+            //test.finish();
+            //cout<<"TIMER SEC VAL "<<test.sec()<<" "<<"USEC VAL "<<test.usec()<<endl;
         }
-
-
 
         Cell best_move=moves[index];
         move[0]=best_move.getX();
