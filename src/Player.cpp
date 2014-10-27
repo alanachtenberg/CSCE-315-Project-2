@@ -153,7 +153,7 @@
         return move;
     }
 
-    int Player::minimax(Board board, int depth,bool max_player_turn){
+    int Player::minimax(Board board, int depth, bool max_player_turn){
         vector<Cell> avail_moves=board.get_moves(board);
         int best;
         int value=0;
@@ -182,9 +182,34 @@
         }
     }
 
-    int Player::ab_pruning(Board board, int depth, int alpha, int beta, Cell::STATE turn){
+    int Player::ab_pruning(Board board, int depth, int alpha, int beta, bool max_player_turn){
+        vector<Cell> avail_moves=board.get_moves(board);
+        if (depth==0||avail_moves.size()==0)
+            return 10;//RETURN THE EVAL FUNCTION
+        if (max_player_turn){//if the turn is our AI's
+            for (unsigned int i=0;i<avail_moves.size();++i){
+                Board new_board=board;
+                new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());
+                alpha = max(alpha, ab_pruning(new_board, depth - 1, alpha, beta, false));
+                if (beta <= alpha)
+                    break;
+            }
+            return alpha;
+        }
+        else {
+            for (unsigned int i=0;i<avail_moves.size();++i){
+                Board new_board=board;
+                new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());
+                beta = min(beta, ab_pruning(new_board, depth - 1, alpha, beta, true));
+                if (beta <= alpha)
+                    break;
+            }
+            return beta;
+        }
+
 
         return 0;
+        
     }
 
 	/*CONSTRUCTORS*/
