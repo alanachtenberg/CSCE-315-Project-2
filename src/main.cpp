@@ -33,7 +33,7 @@ void run() { //send the board to and ask for a command
                         // and send the board state back to the client and ask for another move
                         //this happens until an end condition
 	Board board;
-	Player easy_ai_black(Player::AI,Player::MEDIUM,Cell::BLACK);
+	Player easy_ai_black(Player::AI,Player::HARD,Cell::BLACK);
 	Player easy_ai_white(Player::AI,Player::HARD,Cell::WHITE);
 	vector<int> move;
 	string temp;
