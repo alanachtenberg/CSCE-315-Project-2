@@ -1,5 +1,6 @@
 #include "Player.h"
 #include <limits.h>
+
     /*PRIVATE MEMBER FUNCTIONS*/
     //returns a random move, EASY AI
     vector<int> Player::calc_random(Board board){
