@@ -6,6 +6,10 @@
 #include "Board.h"
 #include "Server.h"
 #include "Player.h"
+
+#define SERVER_PASS "aquafina"
+#define PORT 2323
+
 using namespace std;
 
 string user_move(Server &myServer, Board &board) {
@@ -32,6 +36,7 @@ void run() { //send the board to and ask for a command
                         //when i gets a command back it will execute the command on the board and will choose a random other move
                         // and send the board state back to the client and ask for another move
                         //this happens until an end condition
+
 	Board board;
 	Player easy_ai_black(Player::AI,Player::EASY,Cell::BLACK);
 	Player easy_ai_white(Player::AI,Player::HARD,Cell::WHITE);
@@ -47,6 +52,16 @@ void run() { //send the board to and ask for a command
 	//cin>>temp;
 	}
    	Server myServer(2323);
+   	Server myServer(PORT);
+    string pass;
+    string server_pass=SERVER_PASS;
+    while (pass != server_pass){
+      myServer.send_msg("Please input the password (case insensitive)\n");
+      pass=myServer.read_msg();
+      std::transform(pass.begin(), pass.end(), pass.begin(), ::tolower);
+      sleep(1);
+    }
+
    	while(true){ //win condition
    		myServer.send_msg(board.get_string_board(board));
    		string server_mesg=user_move(myServer, board);
@@ -61,13 +76,10 @@ void run() { //send the board to and ask for a command
 
 
 int main(int argc, char** argv) {
-		Board b;
-
+    
 		try {
-			//base
-            //string mesg=myServer.read_msg();
+      cout<<"SERVER has started\n"<<"PORT is "<<PORT;
             run();
-           // cout<<mesg<<endl;
 
 			return 0;
 		}

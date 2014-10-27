@@ -276,14 +276,16 @@ string Board::redo() {
 }
 
 string Board::command(std::string cmd) {
+	// convert the strings to lowercase so that it is case insensitive
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
 	//we have a comment, ignore rest of line
 	if(cmd.at(0) == ';') ;
 	//we have a move
 	else {
-		if(cmd == "UNDO") return undo();
-		else if(cmd == "REDO") return redo();
-		else if(cmd == "EXIT") exit(0);
-		else if(cmd == "DISPLAY") display = (display) ? false : true;
+		if(cmd == "undo") return undo();
+		else if(cmd == "redo") return redo();
+		else if(cmd == "exit") exit(0);
+		else if(cmd == "display") display = (display) ? false : true;
 		else if (cmd.size()==2){
 			char x_char, y_char;
 			x_char = cmd.at(0);
