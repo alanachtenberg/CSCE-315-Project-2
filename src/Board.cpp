@@ -21,6 +21,20 @@ Cell Board::getCell(int x, int y) {
 		return cell;
 	}
 }
+/*Intended to be used with the player AI, to optimize minimax algorithm, pieces placed by this function have already been
+validated with the get_moves() function, DO NOT USE THIS FUNCTION OUTSIDE OF PLAYER*/
+void Board::placeValidatedPiece(int x, int y){
+    Cell cell;
+    cell.setState(turn);
+    cell.setPosition(x, y);
+    cells[x-1][y-1] = cell;
+    if(turn == Cell::WHITE) {
+        turn = Cell::BLACK;
+    }
+    else {
+        turn = Cell::WHITE;
+    }
+}
 
 string Board::placePiece(int x, int y) {
 	Cell cell;
@@ -418,7 +432,7 @@ Timer test_timer;
 /*determines adjacent moves first and then valid moves from those that are adjacent because
  isMoveValid is a more expensive operation than is adjacent*/
  std::vector<Cell> Board::get_moves(Board& board){//returns vector of moves that are valid and also adjacent
-    test_timer.start();
+   // test_timer.start();
     std::vector<Cell> adj_moves; //determine adjacent moves first
     for (int i=0; i<15;++i){
         for (int j=0; j<15; ++j){
@@ -435,8 +449,8 @@ Timer test_timer;
             valid_moves.push_back(adj_moves[k]);
     }
 
-    test_timer.finish();
-    cout<<"TIMER SEC VAL "<<test_timer.sec()<<" "<<"USEC VAL "<<test_timer.usec()<<endl;
+    //test_timer.finish();
+    //cout<<"TIMER SEC VAL "<<test_timer.sec()<<" "<<"USEC VAL "<<test_timer.usec()<<endl;
     return valid_moves;
 
  }

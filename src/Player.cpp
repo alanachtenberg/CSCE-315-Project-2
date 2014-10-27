@@ -120,16 +120,27 @@
         }
         vector<Cell> moves=board.get_moves(board);
         int max=0;
+        int new_max=0;
         int index=0;
+
+        Timer test;
+
         for (unsigned int i=0;i<moves.size();++i){
+            test.start();
             Board new_board=board;
-            new_board.placePiece(moves[i].getX(),moves[i].getY());//update board to new node
-            int new_max=minimax(board,MINMAX_DEPTH,color);
+            //NOTE placeValidatedPiece is an optimized place piece for when the piece has already been validated
+            new_board.placeValidatedPiece(moves[i].getX(),moves[i].getY());//update board to new node
+            new_max=minimax(board,MINMAX_DEPTH-1,color);
             if(new_max>max){
                 max=new_max;
                 index=i;
             }
+            test.finish();
+            cout<<"TIMER SEC VAL "<<test.sec()<<" "<<"USEC VAL "<<test.usec()<<endl;
         }
+
+
+
         Cell best_move=moves[index];
         move[0]=best_move.getX();
         move[1]=best_move.getY();
@@ -156,7 +167,8 @@
             best=INT_MIN;//lowest possible int
             for (unsigned int i=0;i<avail_moves.size();++i){
                 Board new_board=board;
-                new_board.placePiece(avail_moves[i].getX(),avail_moves[i].getY());// get child board
+                //NOTE placeValidated piece is an optimized function for placing a previously validated piece
+                new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());// get child board
                 value=minimax(board,depth-1,Cell::EMPTY);//gonna use empty.. so i dont have to worry about which color the ai is
                 best=max(value,best); // during the AI turn we will try to find the move that helps the ai the most
             }
@@ -166,7 +178,7 @@
             best=INT_MAX;//highest possible int
             for (unsigned int i=0;i<avail_moves.size();++i){
                 Board new_board=board;
-                new_board.placePiece(avail_moves[i].getX(),avail_moves[i].getY());// get child board
+                new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());// get child board
                 value=minimax(board,depth-1,color);
                 best=min(value,best); // during the oponent's turn we will find the move that hurts the most
             }

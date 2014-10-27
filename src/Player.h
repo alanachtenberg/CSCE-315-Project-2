@@ -1,7 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#define MINMAX_DEPTH 1
+#define MINMAX_DEPTH 3
 #define ALPHABETA_DEPTH 8
 #include "Board.h"
 #include <vector>
