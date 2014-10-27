@@ -12,7 +12,7 @@ using namespace std;
 //internal helper functions
 //----------------------------------------------------------------------
 Cell Board::getCell(int x, int y) {
-	if(x > 0 && y > 0 && x <= 16 && y <= 16) {
+	if(x > 0 && y > 0 && x <= 15 && y <= 15) {
 		return cells[x-1][y-1]; // we must range check greater than 1 instead of 0
 	}
 	else {
@@ -395,6 +395,8 @@ void Board::random_ai(){
 bool Board::is_adjacent(Board& board, Cell cell){//checks if cell is adjacent
         int x=cell.getX();
         int y=cell.getY();
+        if (x==15)
+            x=15;
         Cell::STATE temp;
         //removed vector implementation
         //used these ridiculous if statements to improve the efficiency
@@ -428,14 +430,15 @@ bool Board::is_adjacent(Board& board, Cell cell){//checks if cell is adjacent
         return false;
 
 }
-Timer test_timer;
+
 /*determines adjacent moves first and then valid moves from those that are adjacent because
  isMoveValid is a more expensive operation than is adjacent*/
- std::vector<Cell> Board::get_moves(Board& board){//returns vector of moves that are valid and also adjacent
+std::vector<Cell> Board::get_moves(Board& board){//returns vector of moves that are valid and also adjacent
+   //Timer test_timer;
    // test_timer.start();
     std::vector<Cell> adj_moves; //determine adjacent moves first
-    for (int i=0; i<15;++i){
-        for (int j=0; j<15; ++j){
+    for (int i=1; i<16;++i){ //because get cell returns x-1 y-1, there are 15 positions
+        for (int j=1; j<16; ++j){
             if (board.getCell(i,j).getState()==Cell::EMPTY);//ignore cells that are not empty
                 if (is_adjacent(board, board.getCell(i,j))) //check  if adjacent
                     adj_moves.push_back(board.getCell(i,j)); // save cell

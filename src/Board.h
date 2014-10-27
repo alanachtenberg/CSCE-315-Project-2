@@ -61,8 +61,8 @@ public:
 		turn = Cell::BLACK;
 		moves = 0;
 		display = true;
-		for(int i = 1; i <= 15; i++) {
-			for(int j = 1; j <= 15; j++) {
+		for(int i = 1; i < 16; i++) {
+			for(int j = 1; j < 16; j++) {
 				cells[i-1][j-1].setState(Cell::EMPTY);
 				cells[i-1][j-1].setPosition(i, j);
 			}
