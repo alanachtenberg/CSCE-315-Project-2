@@ -375,6 +375,54 @@ void Board::random_ai(){
 
 }
 
+bool Board::is_adjacent(Board& board, Cell cell){//checks if cell is adjacent
+        std::vector<Cell> adjacent_cells;
+        int x=cell.getX();
+        int y=cell.getY();
+
+        adjacent_cells.push_back(board.getCell(x,y-1));    //N cell
+        adjacent_cells.push_back(board.getCell(x-1,y-1));   //NW cell
+        adjacent_cells.push_back(board.getCell(x+1,y-1));   //NE cell
+        adjacent_cells.push_back(board.getCell(x,y+1));     //S cell
+        adjacent_cells.push_back(board.getCell(x-1,y+1));   //SW cell
+        adjacent_cells.push_back(board.getCell(x+1,y+1));   //SE cell
+        adjacent_cells.push_back(board.getCell(x-1,y));     //W cell
+        adjacent_cells.push_back(board.getCell(x+1,y));     //E cell
+
+        for (unsigned int i=0;i<adjacent_cells.size();++i)//check if cells are occupied
+            if (adjacent_cells[i].getState()!=Cell::OFF_BOARD && adjacent_cells[i].getState()!=cell.EMPTY)
+                return true;
+        return false;
+
+}
+/*determines adjacent moves first and then valid moves from those that are adjacent because
+ isMoveValid is a more expensive operation than is adjacent*/
+ std::vector<Cell> Board::get_moves(Board& board){//returns vector of moves that are valid and also adjacent
+
+    std::vector<Cell> adj_moves; //determine adjacent moves first
+    for (int i=0; i<15;++i)
+        for (int j=0; j<15; ++j){
+            if (board.getCell(i,j).getState()!=Cell::EMPTY);//ignore cells that are not empty
+                if (is_adjacent(board, board.getCell(i,j))) //check  if adjacent
+                    adj_moves.push_back(board.getCell(i,j)); // save cell
+        }
+
+    std::vector<Cell> valid_moves; //create new list of valid moves from adjacent moves
+    for (unsigned int k=0; k<adj_moves.size();++k){
+        if(isMoveValid(adj_moves[k]))
+            valid_moves.push_back(adj_moves[k]);
+    }
+
+    return valid_moves;
+
+ }
+
+ bool Board::is_board_empty(){
+    if (game_history.size()==0)
+        return true;
+    else
+        return false;
+ }
 //--------------------------------
 //--------------------------------
 

@@ -1,6 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include <vector>
 #include <stack>
 #include <iomanip>
 #include <cstdlib>
@@ -76,6 +77,9 @@ public:
 	}
 
 	void random_ai();
+    bool is_adjacent(Board& board, Cell cell);//determines if cell is adjacent to other cells
+    std::vector<Cell> get_moves(Board& board);//returns vector of moves that are valid and also adjacent
+    bool is_board_empty();
 
 	//print out board's current state
 	friend std::ostream& operator<<(std::ostream &out, Board &board);
