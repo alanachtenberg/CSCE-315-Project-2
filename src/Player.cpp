@@ -94,7 +94,7 @@
             }
         }
 
-        if(!moved){				// If no obvious moves or cant cover  make random move
+        if(!moved){				// If no obvious moves or cant cover  make om move
             //random_X = 1 + rand() % 15;		// create a random number from 1 - 15 for X
             //random_Y = 1 + rand() % 15;		// create a random number from 1 - 15 for Y
             vector<Cell> possible_moves=board.get_moves(board);
@@ -128,7 +128,7 @@
             Board new_board=board;
             //NOTE placeValidatedPiece is an optimized place piece for when the piece has already been validated
             new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());//update board to new node
-            new_max=minimax(board,MINMAX_DEPTH-1,true);
+            new_max=minimax(new_board,MINMAX_DEPTH-1,true);
             if(new_max>max){
                 max=new_max;
                 index=i;
@@ -144,12 +144,34 @@
     }
     // returns a move determined using alpha beta pruning, HARD AI
     vector<int> Player::calc_ab_pruning(Board board){
-        vector<int>move(2);
+               vector<int>move(2); //handle corner case of board being empty
         if (board.is_board_empty()){
-            move[0]=6+rand()%4;// hard AI makes the inteligent decision to make
-            move[1]=6+rand()%4;// the first move near the center of the board
+            move[0]=rand()%16; //get random x between 0 and 15
+            move[1]=rand()%16; // get random y between 0 and 15
             return move;
         }
+        vector<Cell> avail_moves=board.get_moves(board);
+        int max=0;
+        int new_max=0;
+        int index=0;
+       // Timer test;
+        for (unsigned int i=0;i<avail_moves.size();++i){
+         //   test.start();
+            Board new_board=board;
+            //NOTE placeValidatedPiece is an optimized place piece for when the piece has already been validated
+            new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());//update board to new node
+            new_max=ab_pruning(new_board,MINMAX_DEPTH-1,INT_MIN,INT_MAX,true);
+            if(new_max>max){
+                max=new_max;
+                index=i;
+            }
+           // test.finish();
+        //    cout<<"TIMER SEC VAL "<<test.sec()<<" "<<"USEC VAL "<<test.usec()<<endl;
+        }
+
+        Cell best_move=avail_moves[index];//return move in vector form
+        move[0]=best_move.getX();
+        move[1]=best_move.getY();
         return move;
     }
 
@@ -158,14 +180,14 @@
         int best;
         int value=0;
         if (depth==0||avail_moves.size()==0)
-            return 10;//RETURN THE EVAL FUNCTION
+            return rand()%50;//RETURN THE EVAL FUNCTION
         if (max_player_turn){//if the turn is our AI's
             best=INT_MIN;//lowest possible int
             for (unsigned int i=0;i<avail_moves.size();++i){
                 Board new_board=board;
                 //NOTE placeValidated piece is an optimized function for placing a previously validated piece
                 new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());// get child board
-                value=minimax(board,depth-1,false);//magical recursion
+                value=minimax(new_board,depth-1,false);//magical recursion
                 best=max(value,best); // during the AI turn we will try to find the move that helps the ai the most
             }
             return best;
@@ -175,7 +197,7 @@
             for (unsigned int i=0;i<avail_moves.size();++i){
                 Board new_board=board;
                 new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());// get child board
-                value=minimax(board,depth-1,true);
+                value=minimax(new_board,depth-1,true);
                 best=min(value,best); // during the oponent's turn we will find the move that hurts the most
             }
             return best;
@@ -185,13 +207,14 @@
     int Player::ab_pruning(Board board, int depth, int alpha, int beta, bool max_player_turn){
         vector<Cell> avail_moves=board.get_moves(board);
         if (depth==0||avail_moves.size()==0)
-            return 10;//RETURN THE EVAL FUNCTION
+            return rand()%50;//RETURN THE EVAL FUNCTION
         if (max_player_turn){//if the turn is our AI's
             for (unsigned int i=0;i<avail_moves.size();++i){
                 Board new_board=board;
-                new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());
-                alpha = max(alpha, ab_pruning(new_board, depth - 1, alpha, beta, false));
-                if (beta <= alpha)
+                //NOTE placeValidated piece is an optimized function for placing a previously validated piece
+                new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());// get child board
+                alpha=max( alpha, ab_pruning(new_board,depth-1,alpha,beta,false));//magical recursion
+                if (beta<=alpha)
                     break;
             }
             return alpha;
@@ -202,14 +225,11 @@
                 new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());
                 beta = min(beta, ab_pruning(new_board, depth - 1, alpha, beta, true));
                 if (beta <= alpha)
+
                     break;
             }
             return beta;
         }
-
-
-        return 0;
-        
     }
 
 	/*CONSTRUCTORS*/
