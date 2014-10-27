@@ -65,6 +65,9 @@ string Board::placePiece(int x, int y) {
 	case 4:
 		error_message = "Cannot place an empty piece\n";
 		return "ERROR";
+    default:
+        error_message= "Unknown isMoveValid result\n";
+        return "ERROR";
 	}
 }
 

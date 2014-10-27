@@ -20,8 +20,11 @@ private:
     DIFFICULTY difficulty;
     /*PRIVATE MEMBER FUNCTIONS*/
     vector<int> calc_random(Board board); //returns a random move, EASY AI
-    vector<int> calc_mininmax(Board board, int depth);// returns a move determined using minimax, MEDIUM AI
-    vector<int> calc_ab_pruning(Board board, int depth);// returns a move determined using alpha beta pruning, HARD AI
+    vector<int> calc_mininmax(Board board);// returns a move determined using minimax, MEDIUM AI
+    vector<int> calc_ab_pruning(Board board);// returns a move determined using alpha beta pruning, HARD AI
+
+    int minimax(Board board, int depth, Cell::STATE max_player);
+    int ab_pruning(Board board, int depth, Cell::STATE max_player);
 public:
 
 

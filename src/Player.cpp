@@ -1,4 +1,5 @@
 #include "Player.h"
+#include <limits.h>
     /*PRIVATE MEMBER FUNCTIONS*/
     //returns a random move, EASY AI
     vector<int> Player::calc_random(Board board){
@@ -96,7 +97,6 @@
             //random_X = 1 + rand() % 15;		// create a random number from 1 - 15 for X
             //random_Y = 1 + rand() % 15;		// create a random number from 1 - 15 for Y
             vector<Cell> possible_moves=board.get_moves(board);
-            int num_moves=possible_moves.size();
             if (possible_moves.size()<1){
                 string err="ERR NO POSSSIBLE MOVES\n";
                 cout<<err;
@@ -110,13 +110,72 @@
     }
 
     // returns a move determined using minimax, MEDIUM AI
-    vector<int> Player::calc_mininmax(Board board, int depth){
-        return vector<int>();
+    vector<int> Player::calc_mininmax(Board board){
+        vector<int>move(2); //handle corner case of board being empty
+        if (board.is_board_empty()){
+            move[0]=rand()%16; //get random x between 0 and 15
+            move[1]=rand()%16; // get random y between 0 and 15
+            return move;
+        }
+        vector<Cell> moves=board.get_moves(board);
+        int max=0;
+        int index=0;
+        for (unsigned int i=0;i<moves.size();++i){
+            Board new_board=board;
+            new_board.placePiece(moves[i].getX(),moves[i].getY());//update board to new node
+            int new_max=minimax(board,MINMAX_DEPTH,color);
+            if(new_max>max){
+                max=new_max;
+                index=i;
+            }
+        }
+        Cell best_move=moves[index];
+        move[0]=best_move.getX();
+        move[1]=best_move.getY();
+        return move;
+    }
+    // returns a move determined using alpha beta pruning, HARD AI
+    vector<int> Player::calc_ab_pruning(Board board){
+        vector<int>move(2);
+        if (board.is_board_empty()){
+            move[0]=6+rand()%4;// hard AI makes the inteligent decision to make
+            move[1]=6+rand()%4;// the first move near the center of the board
+            return move;
+        }
+        return move;
     }
 
-    // returns a move determined using alpha beta pruning, HARD AI
-    vector<int> Player::calc_ab_pruning(Board board, int depth){
-        return vector<int>();
+    int Player::minimax(Board board, int depth, Cell::STATE turn){
+        vector<Cell> avail_moves=board.get_moves(board);
+        int best;
+        int value=0;
+        if (depth==0||avail_moves.size()==0)
+            return 10;//RETURN THE EVAL FUNCTION
+        if (turn==color){//if the turn is our AI's
+            best=INT_MIN;//lowest possible int
+            for (unsigned int i=0;i<avail_moves.size();++i){
+                Board new_board=board;
+                new_board.placePiece(avail_moves[i].getX(),avail_moves[i].getY());// get child board
+                value=minimax(board,depth-1,Cell::EMPTY);//gonna use empty.. so i dont have to worry about which color the ai is
+                best=max(value,best); // during the AI turn we will try to find the move that helps the ai the most
+            }
+            return best;
+        }
+        else{
+            best=INT_MAX;//highest possible int
+            for (unsigned int i=0;i<avail_moves.size();++i){
+                Board new_board=board;
+                new_board.placePiece(avail_moves[i].getX(),avail_moves[i].getY());// get child board
+                value=minimax(board,depth-1,color);
+                best=min(value,best); // during the oponent's turn we will find the move that hurts the most
+            }
+            return best;
+        }
+    }
+
+    int Player::ab_pruning(Board board, int depth, Cell::STATE turn){
+
+        return 0;
     }
 
 	/*CONSTRUCTORS*/
@@ -140,15 +199,15 @@
     //by calling the correspondinf calc function of the correct difficulty
     vector<int> Player::calc_move(Board& board){
 
-        switch(difficulty) { //determin difficulty
+        switch(difficulty) { //determine difficulty
         case Player::EASY:
             return calc_random(board);//random move
 
         case Player::MEDIUM:
-            return calc_mininmax(board, MINMAX_DEPTH);//minimax move
+            return calc_mininmax(board);//minimax move
 
         case Player::HARD:
-            return calc_ab_pruning(board, ALPHABETA_DEPTH);// alpha beta pruning move
+            return calc_ab_pruning(board);// alpha beta pruning move
 
         default:
             cerr<<"ERR, unknown DIFICULTY for AI\n";
