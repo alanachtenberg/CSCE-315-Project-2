@@ -2,10 +2,12 @@
 #include <stdio.h>
 #include <iomanip>
 #include <exception>
+#include <limits.h>
 #include <stdexcept>
 #include <string>
 #include <sstream>
 #include "Board.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -184,7 +186,7 @@ int Board::isMoveValid(Cell cell) {
 
 	//check for winning condition of a row of exactly 5
 	for(int i = 0; i < 4; i++) {
-		if((dirs[i] + dirs[i+4] - 1) >= 5) {
+		if((dirs[i] + dirs[i+4] - 1) == 5) {
 			return 1; //game is over, whover just played has won
 		}
 	}
@@ -504,4 +506,63 @@ istream& operator>>(istream &in, Board &board) {
 	board.command(cmd);
 
 	return in;
+}
+
+int Board::evaluate_cell(Cell current_cell){
+	int dirs[8];
+	dirs[0] = checkPath(current_cell, Cell::N);
+	dirs[1] = checkPath(current_cell, Cell::NE);
+	dirs[2] = checkPath(current_cell, Cell::E);
+	dirs[3] = checkPath(current_cell, Cell::SE);
+	dirs[4] = checkPath(current_cell, Cell::S);
+	dirs[5] = checkPath(current_cell, Cell::SW);
+	dirs[6] = checkPath(current_cell, Cell::W);
+	dirs[7] = checkPath(current_cell, Cell::NW);
+
+	int max_our = 0;
+	int N_to_S = dirs[0]-1 + dirs[4]-1;// minus 2 because middle vaule is counted twice
+	int NE_to_SW = dirs[1]-1 + dirs[5]-1;
+	int E_to_W = dirs[2]-1 + dirs[6]-1;
+	int SE_to_NW = dirs[3]-1 + dirs[7]-1;
+
+
+	max_our = max(N_to_S, max(NE_to_SW, max(E_to_W, SE_to_NW)));
+	if (max_our == 4) max_our = 1000;
+	else if ( max_our > 4) max_our = -1;
+
+
+	/*Cell other_cell;
+	Cell::STATE state = (current_cell.getState() == Cell::BLACK) ? Cell::WHITE : Cell::BLACK;
+	other_cell.setState(state);
+	other_cell.setX(current_cell.getX());
+	other_cell.setY(current_cell.getY());
+
+	int dirs_other[8];
+	dirs_other[0] = checkPath(other_cell, Cell::N);
+	dirs_other[1] = checkPath(other_cell, Cell::NE);
+	dirs_other[2] = checkPath(other_cell, Cell::E);
+	dirs_other[3] = checkPath(other_cell, Cell::SE);
+	dirs_other[4] = checkPath(other_cell, Cell::S);
+	dirs_other[5] = checkPath(other_cell, Cell::SW);
+	dirs_other[6] = checkPath(other_cell, Cell::W);
+	dirs_other[7] = checkPath(other_cell, Cell::NW);
+
+	int max_other = 0;
+	int N_to_S_other = dirs_other[0]-1 + dirs_other[4]-1;// minus 2 because middle vaule is counted twice
+	int NE_to_SW_other = dirs_other[1]-1 + dirs_other[5]-1;
+	int E_to_W_other = dirs_other[2]-1 + dirs_other[6]-1;
+	int SE_to_NW_other = dirs_other[3]-1 + dirs_other[7]-1;
+
+	max_other = max(N_to_S_other, max(NE_to_SW_other, max(E_to_W_other, SE_to_NW_other)));
+
+	if (max_other == 4) max_other = 999;
+
+	
+	int total_other = N_to_S_other + NE_to_SW_other + E_to_W_other + SE_to_NW_other;
+
+	return max(max_our, max (max_other, max(total, total_other)));
+	*/
+	int total = N_to_S + NE_to_SW + E_to_W + SE_to_NW + 1; //make sure our total is always greater than defending
+	return max(max_our, total);
+
 }

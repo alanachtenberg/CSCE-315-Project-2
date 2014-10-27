@@ -2,7 +2,7 @@
 #define PLAYER_H
 
 #define MINMAX_DEPTH 3
-#define ALPHABETA_DEPTH 5
+#define ALPHABETA_DEPTH 3
 #include "Board.h"
 #include <vector>
 using namespace std;
@@ -23,8 +23,9 @@ private:
     vector<int> calc_mininmax(Board board);// returns a move determined using minimax, MEDIUM AI
     vector<int> calc_ab_pruning(Board board);// returns a move determined using alpha beta pruning, HARD AI
 
+
     int minimax(Board board, int depth, bool max_player_turn);
-    int ab_pruning(Board board, int depth,int alpha, int beta, bool);
+    int ab_pruning(Board board, int depth,int alpha, int beta, bool, int, int);
 public:
 
 

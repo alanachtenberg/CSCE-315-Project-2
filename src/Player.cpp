@@ -160,7 +160,7 @@
             Board new_board=board;
             //NOTE placeValidatedPiece is an optimized place piece for when the piece has already been validated
             new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());//update board to new node
-            new_max=ab_pruning(new_board,MINMAX_DEPTH-1,INT_MIN,INT_MAX,true);
+            new_max=ab_pruning(new_board,MINMAX_DEPTH-1,INT_MIN,INT_MAX,true, avail_moves[i].getX(), avail_moves[i].getY());
             if(new_max>max){
                 max=new_max;
                 index=i;
@@ -172,6 +172,7 @@
         Cell best_move=avail_moves[index];//return move in vector form
         move[0]=best_move.getX();
         move[1]=best_move.getY();
+        cout << "\n\n" << max << endl;
         return move;
     }
 
@@ -204,16 +205,16 @@
         }
     }
 
-    int Player::ab_pruning(Board board, int depth, int alpha, int beta, bool max_player_turn){
+    int Player::ab_pruning(Board board, int depth, int alpha, int beta, bool max_player_turn, int prev_x, int prev_y){
         vector<Cell> avail_moves=board.get_moves(board);
         if (depth==0||avail_moves.size()==0)
-            return rand()%50;//RETURN THE EVAL FUNCTION
+            return board.evaluate_cell(board.getCell(prev_x, prev_y));//RETURN THE EVAL FUNCTION
         if (max_player_turn){//if the turn is our AI's
             for (unsigned int i=0;i<avail_moves.size();++i){
                 Board new_board=board;
                 //NOTE placeValidated piece is an optimized function for placing a previously validated piece
                 new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());// get child board
-                alpha=max( alpha, ab_pruning(new_board,depth-1,alpha,beta,false));//magical recursion
+                alpha=max( alpha, ab_pruning(new_board,depth-1,alpha,beta,false, avail_moves[i].getX(), avail_moves[i].getY()));//magical recursion
                 if (beta<=alpha)
                     break;
             }
@@ -223,7 +224,7 @@
             for (unsigned int i=0;i<avail_moves.size();++i){
                 Board new_board=board;
                 new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());
-                beta = min(beta, ab_pruning(new_board, depth - 1, alpha, beta, true));
+                beta = min(beta, ab_pruning(new_board, depth - 1, alpha, beta, true, avail_moves[i].getX(), avail_moves[i].getY()));
                 if (beta <= alpha)
 
                     break;
