@@ -2,8 +2,100 @@
     /*PRIVATE MEMBER FUNCTIONS*/
     //returns a random move, EASY AI
     vector<int> Player::calc_random(Board board){
+        vector<int> move=vector<int>(2);
+        Cell cell = board.getGameHistory().top();
 
-        return vector<int>();
+        bool moved = false;								// used for while loop determining where to move
+
+        int dirs[8];
+        dirs[0] = board.checkPath(cell, Cell::N);
+        dirs[1] = board.checkPath(cell, Cell::NE);
+        dirs[2] = board.checkPath(cell, Cell::E);
+        dirs[3] = board.checkPath(cell, Cell::SE);
+        dirs[4] = board.checkPath(cell, Cell::S);
+        dirs[5] = board.checkPath(cell, Cell::SW);
+        dirs[6] = board.checkPath(cell, Cell::W);
+        dirs[7] = board.checkPath(cell, Cell::NW);
+
+        int N_to_S = dirs[0] + dirs[4]-1;// minus 1 because middle vaule is counted twice
+        int NE_to_SW = dirs[1] + dirs[5]-1;
+        int E_to_W = dirs[2] + dirs[6]-1;
+        int SE_to_NW = dirs[3] + dirs[7]-1;
+
+        if(N_to_S >= 3){
+            // if N can be covered cover
+            if(board.getCell(cell.getX(), cell.getY() - dirs[0]).getState() == Cell::EMPTY){
+                //placePiece(cell.getX(), cell.getY() - dirs[0]);
+                move[0]=cell.getX();//x
+                move[1]=cell.getY()- dirs[0];//y
+                moved = true;
+            }
+            // if S can be covered cover
+            else if(board.getCell(cell.getX(), cell.getY() + dirs[4]).getState() == Cell::EMPTY){
+                //placePiece(cell.getX(), cell.getY() + dirs[4]);
+                move[0]=cell.getX();
+                move[1]=cell.getY() + dirs[4];
+                moved = true;
+            }
+        }
+        else if(NE_to_SW >= 3){
+            // if NE can be covered cover
+            if(board.getCell(cell.getX() + dirs[1], cell.getY() - dirs[1]).getState() == Cell::EMPTY){
+                //placePiece(cell.getX() + dirs[1], cell.getY() - dirs[1]);
+                move[0]=cell.getX()+dirs[1];//x
+                move[1]=cell.getY()-dirs[1];//y
+                moved = true;
+            }
+            // if SW can be covered cover
+            else if(board.getCell(cell.getX() - dirs[5], cell.getY() + dirs[5]).getState() == Cell::EMPTY){
+                //placePiece(cell.getX() - dirs[5], cell.getY() + dirs[5]);
+                move[0]=cell.getX()-dirs[5];//x
+                move[1]=cell.getY()+dirs[5];//y
+                moved = true;
+            }
+        }
+        else if(E_to_W >= 3){
+            // if E can be covered cover
+            if(board.getCell(cell.getX() + dirs[2], cell.getY()).getState() == Cell::EMPTY){
+                //placePiece(cell.getX() + dirs[2], cell.getY());
+                move[0]=cell.getX()+dirs[2];//x
+                move[1]=cell.getY();//y
+                moved = true;
+            }
+            // if W can be covered cover
+            else if(board.getCell(cell.getX() - dirs[6], cell.getY()).getState() == Cell::EMPTY){
+                //placePiece(cell.getX() - dirs[6], cell.getY());
+                move[0]=cell.getX()-dirs[6];//x
+                move[1]=cell.getY();//y
+                moved = true;
+            }
+        }
+        else if(SE_to_NW >= 3){
+            // if SE can be covered cover
+            if(board.getCell(cell.getX() + dirs[3], cell.getY() + dirs[3]).getState() == Cell::EMPTY){
+                //placePiece(cell.getX() + dirs[3], cell.getY() + dirs[3]);
+                move[0]=cell.getX()+dirs[3];//x
+                move[1]=cell.getY()+dirs[3];//y
+                moved = true;
+            }
+            // if NW can be covered cover
+            else if(board.getCell(cell.getX() - dirs[7], cell.getY() - dirs[6]).getState() == Cell::EMPTY){
+                //placePiece(cell.getX() - dirs[7], cell.getY() - dirs[6]);
+                move[0]=cell.getX()-dirs[7];//x
+                move[1]=cell.getY()+dirs[6];//y
+                moved = true;
+            }
+        }
+
+        if(!moved){				// If no obvious moves or cant cover  make random move
+            //random_X = 1 + rand() % 15;		// create a random number from 1 - 15 for X
+            //random_Y = 1 + rand() % 15;		// create a random number from 1 - 15 for Y
+            vector<Cell> possible_moves=board.get_moves(board);
+            int random_move= rand() % possible_moves.size();//gets random index to pick from possible moves
+            move[0]=possible_moves[random_move].getX();
+            move[1]=possible_moves[random_move].getY();
+        }
+        return move;
     }
 
     // returns a move determined using minimax, MEDIUM AI

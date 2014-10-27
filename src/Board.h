@@ -34,10 +34,9 @@ private:
 //internal helper functions
 //----------------------------------------------------------------------
 	int isMoveValid(Cell start);
-	Cell getCell(int x, int y);
 
 	int checkPath(Cell start, int count, Cell::DIRECTION direction);
-	int checkPath(Cell start, Cell::DIRECTION direction);
+
 
 	std::string finish(Cell::STATE state);
 
@@ -60,7 +59,11 @@ public:
 
 //public APIs
 //----------------------------------------------------------------------
+	std::stack<Cell> getGameHistory(){return game_history;}
+	int checkPath(Cell start, Cell::DIRECTION direction);
 	Cell::STATE getTurn() { return turn; }
+
+	Cell getCell(int x, int y);
 	std::string placePiece(int x, int y);
 
 	std::string undo();
