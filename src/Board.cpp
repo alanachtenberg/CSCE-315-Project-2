@@ -310,6 +310,27 @@ string Board::command(std::string cmd) {
 
 	return "";
 }
+
+string Board::game_mode(std::string gm){
+	if(gm == "1") return "1";
+	else if(gm == "2") return "2";
+	else if(gm == "3") return "3";
+	else{
+		error_message = "INVALID SELECTION\n";
+		return "ERROR";
+	}
+}
+
+string Board::AI_difficulty(std::string dif){
+	std::transform(dif.begin(), dif.end(), dif.begin(), ::tolower);		// make case insensitive
+	if(dif == "easy") return "EASY";
+	else if(dif == "medium") return "MEDIUM";
+	else if(dif == "hard") return "HARD";
+	else{
+		error_message = "INVALID DIFFICULTY\n";
+		return "ERROR";
+	}
+}
 //--------------------------------
 //--------------------------------
 bool Board::is_adjacent(Board& board, Cell cell){//checks if cell is adjacent
