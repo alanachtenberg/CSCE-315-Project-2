@@ -46,6 +46,7 @@ void run() { //send the board to and ask for a command
                         //this happens until an end condition
 
 	Board board;
+/*  string sds = parse_player("AI", "HARD", "false")
 	Player easy_ai_black(Player::AI,Player::HARD,false);//BLACK PLAYA
 	Player easy_ai_white(Player::AI,Player::MEDIUM,true);//WHITE PLAYA
 	vector<int> move;
@@ -58,7 +59,7 @@ void run() { //send the board to and ask for a command
 	cout<<board.placePiece(move[0],move[1]);
 	cout<<"END WHITE MOVE\n";
 	//cin>>temp;
-	}
+	}*/
    	Server myServer(PORT);
     string pass;                          // string for password
     string server_pass=SERVER_PASS;       // SERVER_PASS is #define'd 
@@ -79,23 +80,33 @@ void run() { //send the board to and ask for a command
     string temp = board.game_mode(response);
 
     if(temp == "1"){
-      parse = parse_player("HUMAN", "RANDOM", "false")
-      Player HUMAN1(parse);//BLACK PLAYA
-      parse = parse_player("HUMAN", "RANDOM", "true")
-      Player HUMAN2(parse);//WHITE PLAYA
+    //  parse = parse_player("HUMAN", "RANDOM", "false")
+      Player HUMAN1(Player::HUMAN, Player::RANDOM, false);//BLACK PLAYA
+  //    parse = parse_player("HUMAN", "RANDOM", "true")
+      Player HUMAN2(Player::HUMAN, Player::RANDOM, true);//WHITE PLAYA
     }
 
     else if(temp == "2"){
-      parse = parse_player("HUMAN", "RANDOM", "false")
-      Player HUMAN(parse);//BLACK PLAYA
+      parse = parse_player("HUMAN", "RANDOM", "false");
+      Player HUMAN(Player::HUMAN, Player::RANDOM, false);//BLACK PLAYA
 
       myServer.send_msg("Please enter difficulty for the AI (EASY, MEDIUM, or HARD): ");
       response = myServer.read_msg();
       response = board.AI_difficulty(response);
-      if(response == "EASY" || response == "MEDIUM" || response == "HARD"){
+      if(response == "EASY"){
         myServer.send_msg(response);
-        parse = parse_player("AI", response, "true");
-        Player AI(parse);
+  //      parse = parse_player("AI", response, "true");
+        Player AI(Player::AI, Player::EASY, true); 
+      }
+      if(response == "MEDIUM"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI(Player::AI, Player::MEDIUM, true); 
+      }
+      if(response == "HARD"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI(Player::AI, Player::HARD, true); 
       }
       else 
         myServer.send_msg(board.error_message);
@@ -106,10 +117,20 @@ void run() { //send the board to and ask for a command
       response = myServer.read_msg();
       response = board.AI_difficulty(response);
 
-      if(response == "EASY" || response == "MEDIUM" || response == "HARD"){
+      if(response == "EASY"){
         myServer.send_msg(response);
-        parse = parse_player("AI", response, "false");          // parse the player info
-        Player AI_1(parse); //BLACK PLAYA
+  //      parse = parse_player("AI", response, "true");
+        Player AI_1(Player::AI, Player::EASY, false); 
+      }
+      if(response == "MEDIUM"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI_1(Player::AI, Player::MEDIUM, false); 
+      }
+      if(response == "HARD"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI_1(Player::AI, Player::HARD, false); 
       }
       else
         myServer.send_msg(board.error_message);
@@ -117,10 +138,20 @@ void run() { //send the board to and ask for a command
       myServer.send_msg("Please enter difficulty of the Second AI (EASY, MEDIUM, or HARD): ");
       response = myServer.read_msg();
       response = board.AI_difficulty(response);
-      if(response == "EASY" || response == "MEDIUM" || response == "HARD"){
+      if(response == "EASY"){
         myServer.send_msg(response);
-        parse = parse_player("AI", response, "true");           // parse the player info
-        Player AI_2(parse); //WHITE PLAYA
+  //      parse = parse_player("AI", response, "true");
+        Player AI_2(Player::AI, Player::EASY, true); 
+      }
+      if(response == "MEDIUM"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI_2(Player::AI, Player::MEDIUM, true); 
+      }
+      if(response == "HARD"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI_2(Player::AI, Player::HARD, true); 
       }
       else
         myServer.send_msg(board.error_message);
