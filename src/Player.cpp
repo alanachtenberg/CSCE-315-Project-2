@@ -128,7 +128,7 @@
             Board new_board(board);
             //NOTE placeValidatedPiece is an optimized place piece for when the piece has already been validated
             new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());//update board to new node
-            new_max=minimax(new_board,MINMAX_DEPTH-1,true);
+            new_max=minimax(new_board,MINMAX_DEPTH-1,false);
             if(new_max>max){
 
                 index=i;
@@ -162,7 +162,7 @@
             Board new_board(board);
             //NOTE placeValidatedPiece is an optimized place piece for when the piece has already been validated
             new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());//update board to new node
-            new_max=ab_pruning(new_board,ALPHABETA_DEPTH-1,INT_MIN,INT_MAX,true, avail_moves[i].getX(), avail_moves[i].getY());
+            new_max=ab_pruning(new_board,ALPHABETA_DEPTH-1,INT_MIN,INT_MAX,false, avail_moves[i].getX(), avail_moves[i].getY());
             if(new_max>=max){
                 index=i;
                 cout<<"MOVE# "<<avail_moves[i].getX()<<" # "<<avail_moves[i].getY()<<" NEW MAX ### "<<new_max<<" OLD MAX ### "<<max<<endl;

@@ -2,7 +2,7 @@
 #define PLAYER_H
 
 #define MINMAX_DEPTH 2
-#define ALPHABETA_DEPTH 2
+#define ALPHABETA_DEPTH 4
 #include "Board.h"
 #include <vector>
 using namespace std;

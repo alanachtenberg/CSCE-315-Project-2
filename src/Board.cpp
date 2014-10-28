@@ -429,11 +429,12 @@ istream& operator>>(istream &in, Board &board) {
 int Board::evaluate_board(bool isWhite){
     //cout<<*this;
 	int total=0;
+	int good_val=0, evil_val=0;
 	for(int i=1;i<16;++i)
         for (int j=1;j<16;++j)
             {
                 int dirs[8];
-                bool open_dirs[8];
+                bool dirs_open[8];
                 Cell cell= getCell(i,j);
                 if (isWhite&&cell.getState()==Cell::WHITE || !isWhite && cell.getState()==Cell::BLACK){
                     dirs[0] = checkPath(cell, Cell::N);
@@ -445,14 +446,14 @@ int Board::evaluate_board(bool isWhite){
                     dirs[6] = checkPath(cell, Cell::W);
                     dirs[7] = checkPath(cell, Cell::NW);
 
-                    open_dirs[0]=getCell(cell.getX(),cell.getY()-dirs[0]).getState()==Cell::EMPTY;
-                    open_dirs[1]=getCell(cell.getX()+dirs[1],cell.getY()-dirs[1]).getState()==Cell::EMPTY;
-                    open_dirs[2]=getCell(cell.getX()+dirs[2],cell.getY()).getState()==Cell::EMPTY;
-                    open_dirs[3]=getCell(cell.getX()+dirs[3],cell.getY()+dirs[3]).getState()==Cell::EMPTY;
-                    open_dirs[4]=getCell(cell.getX(),cell.getY()+dirs[4]).getState()==Cell::EMPTY;
-                    open_dirs[5]=getCell(cell.getX()-dirs[5],cell.getY()+dirs[5]).getState()==Cell::EMPTY;
-                    open_dirs[6]=getCell(cell.getX()-dirs[6],cell.getY()).getState()==Cell::EMPTY;
-                    open_dirs[7]=getCell(cell.getX()-dirs[7],cell.getY()-dirs[7]).getState()==Cell::EMPTY;
+                    dirs_open[0]=getCell(cell.getX(),cell.getY()-dirs[0]).getState()==Cell::EMPTY;
+                    dirs_open[1]=getCell(cell.getX()+dirs[1],cell.getY()-dirs[1]).getState()==Cell::EMPTY;
+                    dirs_open[2]=getCell(cell.getX()+dirs[2],cell.getY()).getState()==Cell::EMPTY;
+                    dirs_open[3]=getCell(cell.getX()+dirs[3],cell.getY()+dirs[3]).getState()==Cell::EMPTY;
+                    dirs_open[4]=getCell(cell.getX(),cell.getY()+dirs[4]).getState()==Cell::EMPTY;
+                    dirs_open[5]=getCell(cell.getX()-dirs[5],cell.getY()+dirs[5]).getState()==Cell::EMPTY;
+                    dirs_open[6]=getCell(cell.getX()-dirs[6],cell.getY()).getState()==Cell::EMPTY;
+                    dirs_open[7]=getCell(cell.getX()-dirs[7],cell.getY()-dirs[7]).getState()==Cell::EMPTY;
                     int max_our = 0;
                     int N_to_S = dirs[0] + dirs[4]-1;// minus 1 because middle vaule is counted twice
                     int NE_to_SW = dirs[1] + dirs[5]-1;
@@ -477,27 +478,48 @@ int Board::evaluate_board(bool isWhite){
                     axis_open[2]= E_to_W_open;
                     axis_open[3]= SE_to_NW_open;
 
-                    for (int i=0;i<4;++i){
-                        if (axis[i]==5)
-                            return 100000;
-                        else if(axis[i]==4 && )
-                    }
-                    int count_array[4]={0,0,0,0};//contains count of rows of 1 2 3 and 4
-                    for (int i=0;i<4;++i){
-                        switch(axis[i]){
-                            case 2:
-                                count_array[1]=count_array[1]+1; //two in a row
-                                break;
-                            case 3:
-                                count_array[2]=count_array[2]+1; //three in a row
-                                break;
-                            case 4:
-                                count_array[3]=count_array[3]+1; //four in a row
-                                break;
+                    int five=0;
+                    int live_four=0, sleep_four=0, double_sleep_four=0;
+                    int live_three=0, sleep_three=0, double_sleep_three=0;
+                    int live_two=0, sleep_two=0, double_sleep_two=0;
 
-                        }
-                        total = total+count_array[1]+count_array[2]*5+count_array[3]*10;
+                    for (int i=0;i<4;++i){
+                        if(axis[i]==5) five++;
+
+                        else if(axis[i]==4 && (dirs_open[i] && dirs_open[i+4])) live_four++;
+                        else if(axis[i]==4 && (dirs_open[i] || dirs_open[i+4])) sleep_four++;
+
+                        else if(axis[i]==3 && (dirs_open[i] && dirs_open[i+4])) live_three++;
+                        else if(axis[i]==3 && (dirs_open[i] || dirs_open[i+4])) sleep_three++;
+
+                        else if(axis[i]==2 && (dirs_open[i] && dirs_open[i+4])) live_two++;
+                        else if(axis[i]==2 && (dirs_open[i] || dirs_open[i+4])) sleep_two++;
                     }
+
+                    if (five>0)
+                        good_val = max(100000,good_val);
+                    else if((live_four>=4) || (sleep_four>=8) || (sleep_four>=4 && live_three>=3))
+                        good_val =  max(10000,good_val);
+                    else if(live_three >=6)
+                        good_val =  max(5000,good_val);
+                    else if((live_three >=3) && (sleep_three >=3))
+                        good_val =  max(1000,good_val);
+                    else if((sleep_four >=4))
+                        good_val =  max(500,good_val);
+                    else if((live_three >=3))
+                        good_val =  max(200,good_val);
+                    else if((live_two >=4))
+                        good_val =  max(100,good_val);
+                    else if(sleep_three >=3)
+                        good_val =  max(50,good_val);
+                    else if(sleep_two >=4)
+                        good_val =  max(10,good_val);
+                    else if(live_two >=2)
+                        good_val =  max(5,good_val);
+                    else if(sleep_two >=2)
+                        good_val =  max(3,good_val);
+                 //   else
+                 //       good_val = 0;
                 }
                 if (isWhite&&cell.getState()==Cell::BLACK || !isWhite && cell.getState()==Cell::WHITE){
                     dirs[0] = checkPath(cell, Cell::N);
@@ -509,42 +531,84 @@ int Board::evaluate_board(bool isWhite){
                     dirs[6] = checkPath(cell, Cell::W);
                     dirs[7] = checkPath(cell, Cell::NW);
 
-                    int N_to_S = dirs[0] + dirs[4]-1;// minus 2 because middle vaule is counted twice
+                    dirs_open[0]=getCell(cell.getX(),cell.getY()-dirs[0]).getState()==Cell::EMPTY;
+                    dirs_open[1]=getCell(cell.getX()+dirs[1],cell.getY()-dirs[1]).getState()==Cell::EMPTY;
+                    dirs_open[2]=getCell(cell.getX()+dirs[2],cell.getY()).getState()==Cell::EMPTY;
+                    dirs_open[3]=getCell(cell.getX()+dirs[3],cell.getY()+dirs[3]).getState()==Cell::EMPTY;
+                    dirs_open[4]=getCell(cell.getX(),cell.getY()+dirs[4]).getState()==Cell::EMPTY;
+                    dirs_open[5]=getCell(cell.getX()-dirs[5],cell.getY()+dirs[5]).getState()==Cell::EMPTY;
+                    dirs_open[6]=getCell(cell.getX()-dirs[6],cell.getY()).getState()==Cell::EMPTY;
+                    dirs_open[7]=getCell(cell.getX()-dirs[7],cell.getY()-dirs[7]).getState()==Cell::EMPTY;
+                    int max_our = 0;
+                    int N_to_S = dirs[0] + dirs[4]-1;// minus 1 because middle vaule is counted twice
                     int NE_to_SW = dirs[1] + dirs[5]-1;
                     int E_to_W = dirs[2] + dirs[6]-1;
                     int SE_to_NW = dirs[3] + dirs[7]-1;
 
+                    bool N_to_S_open = dirs_open[0] && dirs_open[4];// minus 1 because middle vaule is counted twice
+                    bool NE_to_SW_open = dirs_open[1] && dirs_open[5];
+                    bool E_to_W_open = dirs_open[2] && dirs_open[6]-1;
+                    bool SE_to_NW_open = dirs_open[3] && dirs_open[7]-1;
+
                     int axis[4];
+                    bool axis_open[4];
 
                     axis[0]=N_to_S;
                     axis[1]= NE_to_SW;
                     axis[2]= E_to_W;
                     axis[3]= SE_to_NW;
 
-                    for (int i=0;i<4;++i){
-                        if (axis[i]>=4)
-                     //       axis[i]=0;//if the number in the row over shoots set its value to 0
-                     //   if (axis[i]==5)
-                            return INT_MIN;
-                    }
-                    int count_array[4]={0,0,0,0};//contains count of rows of 1 2 3 and 4
-                    for (int i=0;i<4;++i){
-                        switch(axis[i]){
-                            case 2:
-                                count_array[1]=count_array[1]+1; //two in a row
-                                break;
-                            case 3:
-                                count_array[2]=count_array[2]+1; //three in a row
-                                break;
-                            case 4:
-                                count_array[3]=count_array[3]+1; //four in a row
-                                break;
+                    axis_open[0]=N_to_S_open;
+                    axis_open[1]= NE_to_SW_open;
+                    axis_open[2]= E_to_W_open;
+                    axis_open[3]= SE_to_NW_open;
 
-                        }
-                        total = total-count_array[1]-count_array[2]*5-count_array[3]*10;
+                    int five=0;
+                    int live_four=0, sleep_four=0, double_sleep_four=0;
+                    int live_three=0, sleep_three=0, double_sleep_three=0;
+                    int live_two=0, sleep_two=0, double_sleep_two=0;
+
+                    for (int i=0;i<4;++i){
+                        if(axis[i]==5) five++;
+
+                        else if(axis[i]==4 && (dirs_open[i] && dirs_open[i+4])) live_four++;
+                        else if(axis[i]==4 && (dirs_open[i] || dirs_open[i+4])) sleep_four++;
+
+                        else if(axis[i]==3 && (dirs_open[i] && dirs_open[i+4])) live_three++;
+                        else if(axis[i]==3 && (dirs_open[i] || dirs_open[i+4])) sleep_three++;
+
+                        else if(axis[i]==2 && (dirs_open[i] && dirs_open[i+4])) live_two++;
+                        else if(axis[i]==2 && (dirs_open[i] || dirs_open[i+4])) sleep_two++;
                     }
+
+                    if (five>0)
+                         evil_val = min(-100000,evil_val);
+                    else if((live_four>=4) || (sleep_four>=8) || (sleep_four>=4 && live_three>=3))
+                         evil_val = min(-10000,evil_val);
+                    else if(live_three >=6)
+                         evil_val = min(-5000,evil_val);
+                    else if((live_three >=3) && (sleep_three >=3))
+                         evil_val = min(-1000,evil_val);
+                    else if((sleep_four >=4))
+                         evil_val = min(-500,evil_val);
+                    else if((live_three >=3))
+                         evil_val = min(-200,evil_val);
+                    else if((live_two >=4))
+                         evil_val = min(-100,evil_val);
+                    else if(sleep_three >=3)
+                         evil_val = min(-50,evil_val);
+                    else if(sleep_two >=4)
+                         evil_val = min(-10,evil_val);
+                    else if(live_two >=2)
+                         evil_val = min(-5,evil_val);
+                    else if(sleep_two >=2)
+                         evil_val = min(-3,evil_val);
                 }
-            }
-	return total;
 
+
+            }
+            if(good_val > evil_val*-1)
+                    return good_val;
+                else
+                    return evil_val;
 }

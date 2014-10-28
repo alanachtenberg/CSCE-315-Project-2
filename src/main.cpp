@@ -38,8 +38,8 @@ void run() { //send the board to and ask for a command
                         //this happens until an end condition
 
 	Board board;
-	Player easy_ai_black(Player::AI,Player::HARD,false);//BLACK PLAYA
-	Player easy_ai_white(Player::AI,Player::MEDIUM,true);//WHITE PLAYA
+	Player easy_ai_black(Player::AI,Player::MEDIUM,false);//BLACK PLAYA
+	Player easy_ai_white(Player::AI,Player::HARD,true);//WHITE PLAYA
 	vector<int> move;
 	string temp;
 	while(!board.game_won && temp!="q"){ //simulate MEDIUM AI vs MEDIUM AI
