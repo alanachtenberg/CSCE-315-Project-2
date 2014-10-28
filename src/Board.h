@@ -94,6 +94,8 @@ public:
 	std::string redo();
 
 	std::string command(std::string cmd);
+	std::string game_mode(std::string gm);
+	std::string AI_difficulty(std::string dif);
 
 	void shell() {
 		while(true) {
