@@ -1,12 +1,11 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#define MINMAX_DEPTH 3
-#define ALPHABETA_DEPTH 3
+#define MINMAX_DEPTH 2
+#define ALPHABETA_DEPTH 2
 #include "Board.h"
 #include <vector>
 using namespace std;
-
 
 class Player {
 public:
@@ -15,7 +14,7 @@ public:
 	enum DIFFICULTY { EASY, MEDIUM, HARD, RANDOM };/*PUBLIC DATA MEMBERS*/
 private:
     /*PRIVATE DATA MEMBERS*/
-    Cell::STATE color;//color of the player
+    bool isWhite;//color of the player
     MODE mode;
     DIFFICULTY difficulty;
     /*PRIVATE MEMBER FUNCTIONS*/
@@ -31,7 +30,7 @@ public:
 
 	/*CONSTRUCTORS*/
 	Player();
-	Player(MODE md, DIFFICULTY df, Cell::STATE clr);
+	Player(MODE md, DIFFICULTY df, bool iswhite);
 
     /*PUBLIC MEMBER FUNCTIONS*/
     //returns a vector containing the x and y of the AI's Desired move

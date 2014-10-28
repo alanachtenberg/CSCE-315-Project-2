@@ -48,7 +48,7 @@ private:
     validated with the get_moves() function, DO NOT USE THIS FUNCTION OUTSIDE OF PLAYER OR BEFORE get_moves()*/
     void placeValidatedPiece(int x, int y);
 
-    
+
 
 	std::string finish(Cell::STATE state);
 
@@ -70,6 +70,19 @@ public:
 			}
 		}
 	}
+    Board(Board& b){
+        for(int i=0;i<15;++i)
+            for (int j=0;j<15;++j)
+                cells[i][j]=b.cells[i][j];
+        turn=b.turn;
+        moves=b.moves;
+        timer=b.timer;
+        display=b.display;
+        game_history=b.game_history;
+        undo_history=b.undo_history;
+        game_won=b.game_won;
+        error_message=b.error_message;
+    }
 
 //public APIs
 //----------------------------------------------------------------------
@@ -101,7 +114,7 @@ public:
 	//read into the board from a stream
 	friend std::istream& operator>>(std::istream &in, Board &board);
 	friend class Player;
-	int evaluate_cell(Cell);
+	int evaluate_board(bool isWhite);
 };
 
 #endif
