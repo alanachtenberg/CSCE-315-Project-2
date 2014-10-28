@@ -38,27 +38,26 @@ void run() { //send the board to and ask for a command
                         //this happens until an end condition
 
 	Board board;
-	Player easy_ai_black(Player::AI,Player::EASY,Cell::BLACK);
-	Player easy_ai_white(Player::AI,Player::HARD,Cell::WHITE);
+	Player easy_ai_black(Player::AI,Player::HARD,false);//BLACK PLAYA
+	Player easy_ai_white(Player::AI,Player::MEDIUM,true);//WHITE PLAYA
 	vector<int> move;
 	string temp;
 	while(!board.game_won && temp!="q"){ //simulate MEDIUM AI vs MEDIUM AI
 	move=easy_ai_black.calc_move(board);
 	cout<<board.placePiece(move[0],move[1]);
-	cout<<endl;
+	cout<<"END BLACK MOVE\n";
     move=easy_ai_white.calc_move(board);
 	cout<<board.placePiece(move[0],move[1]);
-	cout<<endl;
+	cout<<"END WHITE MOVE\n";
 	//cin>>temp;
 	}
-   	Server myServer(2323);
    	Server myServer(PORT);
     string pass;
     string server_pass=SERVER_PASS;
     while (pass != server_pass){
       myServer.send_msg("Please input the password (case insensitive)\n");
       pass=myServer.read_msg();
-      std::transform(pass.begin(), pass.end(), pass.begin(), ::tolower);
+      //std::transform(pass.begin(), pass.end(), pass.begin(), ::tolower);
       sleep(1);
     }
 
@@ -66,8 +65,6 @@ void run() { //send the board to and ask for a command
    		myServer.send_msg(board.get_string_board(board));
    		string server_mesg=user_move(myServer, board);
    		myServer.send_msg(server_mesg);
-   		//Insert AI MOVE function here
-   		board.random_ai();
    	}
 
 
@@ -76,9 +73,9 @@ void run() { //send the board to and ask for a command
 
 
 int main(int argc, char** argv) {
-    
+
 		try {
-      cout<<"SERVER has started\n"<<"PORT is "<<PORT;
+      cout<<"SERVER has started\n"<<"PORT is "<<PORT<<endl;
             run();
 
 			return 0;

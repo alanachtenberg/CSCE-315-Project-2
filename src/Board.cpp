@@ -312,90 +312,6 @@ string Board::command(std::string cmd) {
 }
 //--------------------------------
 //--------------------------------
-
-void Board::random_ai(){
-    Cell cell = game_history.top();
-
-	bool moved = false;								// used for while loop determining where to move
-
-	int dirs[8];
-	dirs[0] = checkPath(cell, Cell::N);
-	dirs[1] = checkPath(cell, Cell::NE);
-	dirs[2] = checkPath(cell, Cell::E);
-	dirs[3] = checkPath(cell, Cell::SE);
-	dirs[4] = checkPath(cell, Cell::S);
-	dirs[5] = checkPath(cell, Cell::SW);
-	dirs[6] = checkPath(cell, Cell::W);
-	dirs[7] = checkPath(cell, Cell::NW);
-
-	int N_to_S = dirs[0] + dirs[4]-1;// minus 1 because middle vaule is counted twice
-	int NE_to_SW = dirs[1] + dirs[5]-1;
-	int E_to_W = dirs[2] + dirs[6]-1;
-	int SE_to_NW = dirs[3] + dirs[7]-1;
-	int random_X;									// In case AI makes random move we will need this
-	int random_Y;									// In case AI makes random move we will need this
-
-
-	if(N_to_S >= 3){
-		// if N can be covered cover
-		if(getCell(cell.getX(), cell.getY() - dirs[0]).getState() == Cell::EMPTY){
-			placePiece(cell.getX(), cell.getY() - dirs[0]);
-			moved = true;
-		}
-		// if S can be covered cover
-		else if(getCell(cell.getX(), cell.getY() + dirs[4]).getState() == Cell::EMPTY){
-			placePiece(cell.getX(), cell.getY() + dirs[4]);
-			moved = true;
-		}
-	}
-	else if(NE_to_SW >= 3){
-		// if NE can be covered cover
-		if(getCell(cell.getX() + dirs[1], cell.getY() - dirs[1]).getState() == Cell::EMPTY){
-			placePiece(cell.getX() + dirs[1], cell.getY() - dirs[1]);
-			moved = true;
-		}
-		// if SW can be covered cover
-		else if(getCell(cell.getX() - dirs[5], cell.getY() + dirs[5]).getState() == Cell::EMPTY){
-			placePiece(cell.getX() - dirs[5], cell.getY() + dirs[5]);
-			moved = true;
-		}
-	}
-	else if(E_to_W >= 3){
-		// if E can be covered cover
-		if(getCell(cell.getX() + dirs[2], cell.getY()).getState() == Cell::EMPTY){
-			placePiece(cell.getX() + dirs[2], cell.getY());
-			moved = true;
-		}
-		// if W can be covered cover
-		else if(getCell(cell.getX() - dirs[6], cell.getY()).getState() == Cell::EMPTY){
-			placePiece(cell.getX() - dirs[6], cell.getY());
-			moved = true;
-		}
-	}
-	else if(SE_to_NW >= 3){
-		// if SE can be covered cover
-		if(getCell(cell.getX() + dirs[3], cell.getY() + dirs[3]).getState() == Cell::EMPTY){
-			placePiece(cell.getX() + dirs[3], cell.getY() + dirs[3]);
-			moved = true;
-		}
-		// if NW can be covered cover
-		else if(getCell(cell.getX() - dirs[7], cell.getY() - dirs[6]).getState() == Cell::EMPTY){
-			placePiece(cell.getX() - dirs[7], cell.getY() - dirs[6]);
-			moved = true;
-		}
-	}
-
-	while(!moved){				// If no obvious moves or cant cover  make random move
-		random_X = 1 + rand() % 15;		// create a random number from 1 - 15 for X
-		random_Y = 1 + rand() % 15;		// create a random number from 1 - 15 for Y
-		if(getCell(random_X, random_Y).getState() == Cell::EMPTY){
-			placePiece(random_X, random_Y);
-			moved = true;
-		}
-	}
-
-}
-
 bool Board::is_adjacent(Board& board, Cell cell){//checks if cell is adjacent
         int x=cell.getX();
         int y=cell.getY();
@@ -510,61 +426,125 @@ istream& operator>>(istream &in, Board &board) {
 	return in;
 }
 
-int Board::evaluate_cell(Cell current_cell){
-	int dirs[8];
-	dirs[0] = checkPath(current_cell, Cell::N);
-	dirs[1] = checkPath(current_cell, Cell::NE);
-	dirs[2] = checkPath(current_cell, Cell::E);
-	dirs[3] = checkPath(current_cell, Cell::SE);
-	dirs[4] = checkPath(current_cell, Cell::S);
-	dirs[5] = checkPath(current_cell, Cell::SW);
-	dirs[6] = checkPath(current_cell, Cell::W);
-	dirs[7] = checkPath(current_cell, Cell::NW);
+int Board::evaluate_board(bool isWhite){
+    //cout<<*this;
+	int total=0;
+	for(int i=1;i<16;++i)
+        for (int j=1;j<16;++j)
+            {
+                int dirs[8];
+                bool open_dirs[8];
+                Cell cell= getCell(i,j);
+                if (isWhite&&cell.getState()==Cell::WHITE || !isWhite && cell.getState()==Cell::BLACK){
+                    dirs[0] = checkPath(cell, Cell::N);
+                    dirs[1] = checkPath(cell, Cell::NE);
+                    dirs[2] = checkPath(cell, Cell::E);
+                    dirs[3] = checkPath(cell, Cell::SE);
+                    dirs[4] = checkPath(cell, Cell::S);
+                    dirs[5] = checkPath(cell, Cell::SW);
+                    dirs[6] = checkPath(cell, Cell::W);
+                    dirs[7] = checkPath(cell, Cell::NW);
 
-	int max_our = 0;
-	int N_to_S = dirs[0]-1 + dirs[4]-1;// minus 2 because middle vaule is counted twice
-	int NE_to_SW = dirs[1]-1 + dirs[5]-1;
-	int E_to_W = dirs[2]-1 + dirs[6]-1;
-	int SE_to_NW = dirs[3]-1 + dirs[7]-1;
+                    open_dirs[0]=getCell(cell.getX(),cell.getY()-dirs[0]).getState()==Cell::EMPTY;
+                    open_dirs[1]=getCell(cell.getX()+dirs[1],cell.getY()-dirs[1]).getState()==Cell::EMPTY;
+                    open_dirs[2]=getCell(cell.getX()+dirs[2],cell.getY()).getState()==Cell::EMPTY;
+                    open_dirs[3]=getCell(cell.getX()+dirs[3],cell.getY()+dirs[3]).getState()==Cell::EMPTY;
+                    open_dirs[4]=getCell(cell.getX(),cell.getY()+dirs[4]).getState()==Cell::EMPTY;
+                    open_dirs[5]=getCell(cell.getX()-dirs[5],cell.getY()+dirs[5]).getState()==Cell::EMPTY;
+                    open_dirs[6]=getCell(cell.getX()-dirs[6],cell.getY()).getState()==Cell::EMPTY;
+                    open_dirs[7]=getCell(cell.getX()-dirs[7],cell.getY()-dirs[7]).getState()==Cell::EMPTY;
+                    int max_our = 0;
+                    int N_to_S = dirs[0] + dirs[4]-1;// minus 1 because middle vaule is counted twice
+                    int NE_to_SW = dirs[1] + dirs[5]-1;
+                    int E_to_W = dirs[2] + dirs[6]-1;
+                    int SE_to_NW = dirs[3] + dirs[7]-1;
 
+                    bool N_to_S_open = dirs_open[0] && dirs_open[4];// minus 1 because middle vaule is counted twice
+                    bool NE_to_SW_open = dirs_open[1] && dirs_open[5];
+                    bool E_to_W_open = dirs_open[2] && dirs_open[6]-1;
+                    bool SE_to_NW_open = dirs_open[3] && dirs_open[7]-1;
 
-	max_our = max(N_to_S, max(NE_to_SW, max(E_to_W, SE_to_NW)));
-	if (max_our == 4) max_our = 1000;
-	else if ( max_our > 4) max_our = -1;
+                    int axis[4];
+                    bool axis_open[4];
 
+                    axis[0]=N_to_S;
+                    axis[1]= NE_to_SW;
+                    axis[2]= E_to_W;
+                    axis[3]= SE_to_NW;
 
-	/*Cell other_cell;
-	Cell::STATE state = (current_cell.getState() == Cell::BLACK) ? Cell::WHITE : Cell::BLACK;
-	other_cell.setState(state);
-	other_cell.setX(current_cell.getX());
-	other_cell.setY(current_cell.getY());
+                    axis_open[0]=N_to_S_open;
+                    axis_open[1]= NE_to_SW_open;
+                    axis_open[2]= E_to_W_open;
+                    axis_open[3]= SE_to_NW_open;
 
-	int dirs_other[8];
-	dirs_other[0] = checkPath(other_cell, Cell::N);
-	dirs_other[1] = checkPath(other_cell, Cell::NE);
-	dirs_other[2] = checkPath(other_cell, Cell::E);
-	dirs_other[3] = checkPath(other_cell, Cell::SE);
-	dirs_other[4] = checkPath(other_cell, Cell::S);
-	dirs_other[5] = checkPath(other_cell, Cell::SW);
-	dirs_other[6] = checkPath(other_cell, Cell::W);
-	dirs_other[7] = checkPath(other_cell, Cell::NW);
+                    for (int i=0;i<4;++i){
+                        if (axis[i]==5)
+                            return 100000;
+                        else if(axis[i]==4 && )
+                    }
+                    int count_array[4]={0,0,0,0};//contains count of rows of 1 2 3 and 4
+                    for (int i=0;i<4;++i){
+                        switch(axis[i]){
+                            case 2:
+                                count_array[1]=count_array[1]+1; //two in a row
+                                break;
+                            case 3:
+                                count_array[2]=count_array[2]+1; //three in a row
+                                break;
+                            case 4:
+                                count_array[3]=count_array[3]+1; //four in a row
+                                break;
 
-	int max_other = 0;
-	int N_to_S_other = dirs_other[0]-1 + dirs_other[4]-1;// minus 2 because middle vaule is counted twice
-	int NE_to_SW_other = dirs_other[1]-1 + dirs_other[5]-1;
-	int E_to_W_other = dirs_other[2]-1 + dirs_other[6]-1;
-	int SE_to_NW_other = dirs_other[3]-1 + dirs_other[7]-1;
+                        }
+                        total = total+count_array[1]+count_array[2]*5+count_array[3]*10;
+                    }
+                }
+                if (isWhite&&cell.getState()==Cell::BLACK || !isWhite && cell.getState()==Cell::WHITE){
+                    dirs[0] = checkPath(cell, Cell::N);
+                    dirs[1] = checkPath(cell, Cell::NE);
+                    dirs[2] = checkPath(cell, Cell::E);
+                    dirs[3] = checkPath(cell, Cell::SE);
+                    dirs[4] = checkPath(cell, Cell::S);
+                    dirs[5] = checkPath(cell, Cell::SW);
+                    dirs[6] = checkPath(cell, Cell::W);
+                    dirs[7] = checkPath(cell, Cell::NW);
 
-	max_other = max(N_to_S_other, max(NE_to_SW_other, max(E_to_W_other, SE_to_NW_other)));
+                    int N_to_S = dirs[0] + dirs[4]-1;// minus 2 because middle vaule is counted twice
+                    int NE_to_SW = dirs[1] + dirs[5]-1;
+                    int E_to_W = dirs[2] + dirs[6]-1;
+                    int SE_to_NW = dirs[3] + dirs[7]-1;
 
-	if (max_other == 4) max_other = 999;
+                    int axis[4];
 
-	
-	int total_other = N_to_S_other + NE_to_SW_other + E_to_W_other + SE_to_NW_other;
+                    axis[0]=N_to_S;
+                    axis[1]= NE_to_SW;
+                    axis[2]= E_to_W;
+                    axis[3]= SE_to_NW;
 
-	return max(max_our, max (max_other, max(total, total_other)));
-	*/
-	int total = N_to_S + NE_to_SW + E_to_W + SE_to_NW + 1; //make sure our total is always greater than defending
-	return max(max_our, total);
+                    for (int i=0;i<4;++i){
+                        if (axis[i]>=4)
+                     //       axis[i]=0;//if the number in the row over shoots set its value to 0
+                     //   if (axis[i]==5)
+                            return INT_MIN;
+                    }
+                    int count_array[4]={0,0,0,0};//contains count of rows of 1 2 3 and 4
+                    for (int i=0;i<4;++i){
+                        switch(axis[i]){
+                            case 2:
+                                count_array[1]=count_array[1]+1; //two in a row
+                                break;
+                            case 3:
+                                count_array[2]=count_array[2]+1; //three in a row
+                                break;
+                            case 4:
+                                count_array[3]=count_array[3]+1; //four in a row
+                                break;
+
+                        }
+                        total = total-count_array[1]-count_array[2]*5-count_array[3]*10;
+                    }
+                }
+            }
+	return total;
 
 }
