@@ -3,6 +3,7 @@
 #include <exception>
 #include <stdexcept>
 #include <unistd.h>
+#include <algorithm>
 #include "Board.h"
 #include "Server.h"
 #include "Player.h"
@@ -11,7 +12,10 @@
 #define PORT 2323
 
 using namespace std;
-
+string& to_lower(string& s){
+     std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+     return s;
+}
 // used for parsing the player
 string parse_player(string player, string dif, string color){
   string parse;
@@ -46,97 +50,83 @@ void run() { //send the board to and ask for a command
                         //this happens until an end condition
 
 	Board board;
-	Player easy_ai_black(Player::AI,Player::MEDIUM,false);//BLACK PLAYA
-	Player easy_ai_white(Player::AI,Player::HARD,true);//WHITE PLAYA
-	vector<int> move;
-	string temp;
-	while(!board.game_won && temp!="q"){ //simulate MEDIUM AI vs MEDIUM AI
-	move=easy_ai_black.calc_move(board);
-	cout<<board.placePiece(move[0],move[1]);
-	cout<<"END BLACK MOVE\n";
-    move=easy_ai_white.calc_move(board);
-	cout<<board.placePiece(move[0],move[1]);
-	cout<<"END WHITE MOVE\n";
-	//cin>>temp;
-	}
    	Server myServer(PORT);
     string pass;                          // string for password
-    string server_pass=SERVER_PASS;       // SERVER_PASS is #define'd 
+    string server_pass=SERVER_PASS;       // SERVER_PASS is #define'd
     while (pass != server_pass){
-      myServer.send_msg("Please input the password (case insensitive)\n");
+      myServer.send_msg("PASSWORD\n");
       pass = myServer.read_msg();
-      std::transform(pass.begin(), pass.end(), pass.begin(), ::tolower);
+      to_lower(pass);
       sleep(1);
     }
 
-    string response, parse;
-    Player Player1, Player2;
-    myServer.send_msg("Please enter number corresponding to desired game mode: \n");
-    myServer.send_msg("1. Player vs. Player\n");
-    myServer.send_msg("2. Player vs. AI\n");
-    myServer.send_msg("3. AI vs. AI\n \n");
-    response = myServer.read_msg();
-    string temp = board.game_mode(response);
-
-    if(temp == "1"){
-      parse = parse_player("HUMAN", "RANDOM", "false")
-      Player HUMAN1(parse);//BLACK PLAYA
-      parse = parse_player("HUMAN", "RANDOM", "true")
-      Player HUMAN2(parse);//WHITE PLAYA
+    string player_setting;
+    myServer.send_msg("WELCOME\n");
+    while (player_setting!="human-ai"){
+        player_setting=myServer.read_msg();
+        to_lower(player_setting);
     }
 
-    else if(temp == "2"){
-      parse = parse_player("HUMAN", "RANDOM", "false")
-      Player HUMAN(parse);//BLACK PLAYA
-
-      myServer.send_msg("Please enter difficulty for the AI (EASY, MEDIUM, or HARD): ");
-      response = myServer.read_msg();
-      response = board.AI_difficulty(response);
-      if(response == "EASY" || response == "MEDIUM" || response == "HARD"){
-        myServer.send_msg(response);
-        parse = parse_player("AI", response, "true");
-        Player AI(parse);
-      }
-      else 
-        myServer.send_msg(board.error_message);
+    myServer.send_msg("OK\n");
+    string diff_setting;
+    while (diff_setting!="easy"&&diff_setting!="medium"&&diff_setting!="hard"){
+        diff_setting=myServer.read_msg();
+        to_lower(diff_setting);
     }
+    myServer.send_msg("OK\n");
 
-    else if(temp == "3"){
-      myServer.send_msg("Please enter difficulty of the first AI (EASY, MEDIUM, or HARD): ");
-      response = myServer.read_msg();
-      response = board.AI_difficulty(response);
+    Player::DIFFICULTY diff;
 
-      if(response == "EASY" || response == "MEDIUM" || response == "HARD"){
-        myServer.send_msg(response);
-        parse = parse_player("AI", response, "false");          // parse the player info
-        Player AI_1(parse); //BLACK PLAYA
-      }
-      else
-        myServer.send_msg(board.error_message);
+    if (diff_setting=="easy")
+        diff=Player::EASY;
+    else if (diff_setting=="medium")
+        diff=Player::MEDIUM;
+    else if (diff_setting=="hard")
+        diff=Player::HARD;
+    Player AI(Player::AI,diff,true);//true means Player is white player
+    bool is_displaying=false;
+    string input;
+    while(board.game_won==false){
+        input=myServer.read_msg();
+        to_lower(input);
+        if (input=="exit"){
+            myServer.send_msg("EXITING\n")
+            exit();
+            }
+        if(input=="display"){
+            myServer.send_msg("OK\n");
+            is_displaying=!is_displaying;
+            if (is_displaying)//if it is now displaying send them the board
+                myServer.send_msg(board.get_string_board(board));
+        }
+        else if (input.size()==2){ //size equals 2 must be a move
+            string result=board.command(input);//makes move for player
+            if (result=="ERROR")//if the move was invalid do nothing
+                cout<<board.error_message;
+            else{
+            if (board.game_won){
+                myServer.send_msg(result);
+                break;//end game
+            }
+            else{
+                myServer.send_msg("OK\n");
+                vector<int> AI_move=AI.calc_move(board);
+                board.placePiece(AI_move[0],AI_move[1]);
+                if (is_displaying)
+                    myServer.send_msg(board.get_string_board(board));
+                else{
+                string move_msg;
+                stringstream ss;
+                ss<<AI_move[0]<<AI_move[1];
+                ss>>move_msg;
+                    myServer.send_msg(move_msg);
+                }
+            }
 
-      myServer.send_msg("Please enter difficulty of the Second AI (EASY, MEDIUM, or HARD): ");
-      response = myServer.read_msg();
-      response = board.AI_difficulty(response);
-      if(response == "EASY" || response == "MEDIUM" || response == "HARD"){
-        myServer.send_msg(response);
-        parse = parse_player("AI", response, "true");           // parse the player info
-        Player AI_2(parse); //WHITE PLAYA
-      }
-      else
-        myServer.send_msg(board.error_message);
+            }
+        }
     }
-    else
-      myServer.send_msg(board.error_message);
-    
-
-   	while(true){ //win condition
-   		myServer.send_msg(board.get_string_board(board));
-   		string server_mesg=user_move(myServer, board);
-   		myServer.send_msg(server_mesg);
-   	}
-
-
-
+    myServer.send_msg("GAME OVER, SERVER EXITING\n");
 }
 
 
