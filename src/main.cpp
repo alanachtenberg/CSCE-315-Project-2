@@ -90,8 +90,8 @@ void run() { //send the board to and ask for a command
         input=myServer.read_msg();
         to_lower(input);
         if (input=="exit"){
-            myServer.send_msg("EXITING\n")
-            exit();
+            myServer.send_msg("EXITING\n");
+            exit(0);
             }
         if(input=="display"){
             myServer.send_msg("OK\n");
