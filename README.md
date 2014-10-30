@@ -14,7 +14,8 @@ Compilation Instructions
 1) At the root of the project directory, type 'make' to compile
 2) Program can be executed with 'make run'
 3) In another linux terminal in the Linux server, type 'telnet localhost 2323'
-4) Proceed with playing the game with commands '[hex][hex]' 'UNDO', 'REDO', 'DISPLAY', and 'EXIT'
+4) PASSWORD is aquafina
+5) Proceed with playing the game with commands '[hex][hex]' 'UNDO', 'REDO', 'DISPLAY', and 'EXIT'
 
 Turn-Ins
 =========================

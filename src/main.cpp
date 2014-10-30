@@ -125,6 +125,92 @@ void run() { //send the board to and ask for a command
 
             }
         }
+    string response, parse;
+    Player Player1, Player2;
+    myServer.send_msg("Please enter number corresponding to desired game mode: \n");
+    myServer.send_msg("1. Player vs. Player\n");
+    myServer.send_msg("2. Player vs. AI\n");
+    myServer.send_msg("3. AI vs. AI\n \n");
+    response = myServer.read_msg();
+    string temp = board.game_mode(response);
+
+    if(temp == "1"){
+    //  parse = parse_player("HUMAN", "RANDOM", "false")
+      Player HUMAN1(Player::HUMAN, Player::RANDOM, false);//BLACK PLAYA
+  //    parse = parse_player("HUMAN", "RANDOM", "true")
+      Player HUMAN2(Player::HUMAN, Player::RANDOM, true);//WHITE PLAYA
+    }
+
+    else if(temp == "2"){
+      parse = parse_player("HUMAN", "RANDOM", "false");
+      Player HUMAN(Player::HUMAN, Player::RANDOM, false);//BLACK PLAYA
+
+      myServer.send_msg("Please enter difficulty for the AI (EASY, MEDIUM, or HARD): ");
+      response = myServer.read_msg();
+      response = board.AI_difficulty(response);
+      if(response == "EASY"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI(Player::AI, Player::EASY, true); 
+      }
+      if(response == "MEDIUM"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI(Player::AI, Player::MEDIUM, true); 
+      }
+      if(response == "HARD"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI(Player::AI, Player::HARD, true); 
+      }
+      else 
+        myServer.send_msg(board.error_message);
+    }
+
+    else if(temp == "3"){
+      myServer.send_msg("Please enter difficulty of the first AI (EASY, MEDIUM, or HARD): ");
+      response = myServer.read_msg();
+      response = board.AI_difficulty(response);
+
+      if(response == "EASY"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI_1(Player::AI, Player::EASY, false); 
+      }
+      if(response == "MEDIUM"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI_1(Player::AI, Player::MEDIUM, false); 
+      }
+      if(response == "HARD"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI_1(Player::AI, Player::HARD, false); 
+      }
+      else
+        myServer.send_msg(board.error_message);
+
+      myServer.send_msg("Please enter difficulty of the Second AI (EASY, MEDIUM, or HARD): ");
+      response = myServer.read_msg();
+      response = board.AI_difficulty(response);
+      if(response == "EASY"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI_2(Player::AI, Player::EASY, true); 
+      }
+      if(response == "MEDIUM"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI_2(Player::AI, Player::MEDIUM, true); 
+      }
+      if(response == "HARD"){
+        myServer.send_msg(response);
+  //      parse = parse_player("AI", response, "true");
+        Player AI_2(Player::AI, Player::HARD, true); 
+      }
+      else
+        myServer.send_msg(board.error_message);
+>>>>>>> 72b6c6759a167591317efff6d2a12e2988003e6d
     }
     myServer.send_msg("GAME OVER, SERVER EXITING\n");
 }

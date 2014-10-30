@@ -21,3 +21,9 @@ SEE BACKLOG FOR TASKS ID's info, ID's are of the form #.#
 10/20 robby implemented task 2.5 2.6 2.7
 10/20 casey implemented task 2.4
 10/20 alan updated backlog, burndown chart and dev log
+
+10/26 alan implemented easy medium and hard ai
+10/27 casey alan and robby implemented eval function
+10/27 jacob integrated commands
+
+10/27 robby completed backlog and burndown chart
