@@ -210,9 +210,10 @@ void run() { //send the board to and ask for a command
       }
       else
         myServer.send_msg(board.error_message);
->>>>>>> 72b6c6759a167591317efff6d2a12e2988003e6d
+
     }
     myServer.send_msg("GAME OVER, SERVER EXITING\n");
+  }
 }
 
 
