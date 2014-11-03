@@ -4,7 +4,6 @@ Main.class: Main.java
 	javac Main.java
 
 clean:
-	rm Main.class
-run:
-	make
+	rm *.class
+run: Main.class
 	java Main
