@@ -27,3 +27,10 @@ SEE BACKLOG FOR TASKS ID's info, ID's are of the form #.#
 10/27 jacob integrated commands
 
 10/27 robby completed backlog and burndown chart
+
+11/2 robby implemented main frame
+11/3 alan implented gui board and menu
+11/3 casey jacob implemented client communication
+11/3 robby completed backlog and burndown chart
+
+11/3 alan update devlog
