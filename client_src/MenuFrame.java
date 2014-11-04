@@ -4,15 +4,11 @@ import java.awt.Container;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
 
 
 public class MenuFrame extends JFrame{
@@ -75,7 +71,7 @@ public class MenuFrame extends JFrame{
 		final JLabel		aiPortLabel= new JLabel("Port:");
 		aiPortInput = new JTextField("input AI port number here");
 		
-		String[] modes= {"HUMAN-AI", "AI-AI"};
+		String[] modes= {"HUMAN-AI"};//, "AI-AI"};
 		final JLabel	modeLabel = new JLabel("Mode:");
 		final JComboBox modeInput = new JComboBox(modes);
 		
@@ -132,10 +128,6 @@ public class MenuFrame extends JFrame{
 
 				menuWindow.setVisible(false);
 				
-				JFrame game = new GameFrame("Five in a Row!");
-				game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				game.setVisible(true);
-				
 				GameFrame.serverName=serverInput.getText();
 				GameFrame.portNumber=portInput.getText();
 				GameFrame.aiServerName=aiServerInput.getText();
@@ -143,7 +135,13 @@ public class MenuFrame extends JFrame{
 				GameFrame.password=passInput.getText();
 				GameFrame.mode=modeInput.getSelectedItem().toString();
 				GameFrame.difficulty=diffInput.getSelectedItem().toString();
-				
+				String temp=GameFrame.serverName.substring(0,5);
+				if(temp.equals("input"))
+					System.exit(EXIT_ON_CLOSE);
+					
+				JFrame game = new GameFrame("Five in a Row!");
+				game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				game.setVisible(true);
 			}
 		});
 	}

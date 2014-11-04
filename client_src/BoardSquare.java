@@ -7,7 +7,7 @@ import java.awt.event.MouseListener;
 public class BoardSquare extends JPanel {
 		private static final long serialVersionUID = 1L;
 		
-		int x, y;//position of square
+		public int x, y;//position of square
 		STATE state;
 		public enum STATE {
 			BLACK(Color.BLACK), 

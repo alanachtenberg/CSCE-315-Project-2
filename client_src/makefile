@@ -1,9 +1,9 @@
-all: Main.class
+all: GUI.class
 
-Main.class: Main.java
-	javac Main.java
+GUI.class: GUI.java
+	javac	GUI.java
 
 clean:
 	rm *.class
-run: Main.class
-	java Main
+run: GUI.class
+	java GUI
