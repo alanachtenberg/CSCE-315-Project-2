@@ -31,8 +31,8 @@ Server::Server(int port_num) {
 
     if (client_port_fd==-1)
         cout<<"ERROR IN ACCEPT\n";
-    string msg="---------Hello you have connected to the 5 in a row server\n---------\n";
-    send(client_port_fd, msg.c_str(), msg.size(), 0);//0 means no flags
+    //string msg="---------Hello you have connected to the 5 in a row server---------\n";
+    //send(client_port_fd, msg.c_str(), msg.size(), 0);//0 means no flags
 }
 
 Server::~Server() {
@@ -58,8 +58,17 @@ string Server::read_msg() {
         cout<<"ERROR READING MESSAGE\n";
     else{
         msg= string(buffer);
-        msg.replace(msg.end()-2,msg.end(),"");//replaces the newline char and return char with nothing
+
+        //remove newline chars, mac, linux, and windows
+        char chars[] = {'\r', '\n'};
+
+        for (unsigned int i = 0; i < strlen(chars); ++i) {
+			msg.erase(std::remove(msg.begin(), msg.end(), chars[i]), msg.end());
+		}
+
+        //msg.replace(msg.end()-2,msg.end(),"");//replaces the newline char and return char with nothing
         memset(buffer,0,SOCKET_BUF_SIZE);//clear buffer
+        cout << "RESPONSE " << msg << "\n";
         return msg;
         }
     return string("error");

@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <string>
 #include <sys/types.h>
+#include <algorithm>
 
 #define SOCKET_BUF_SIZE 1024
 using namespace std;
