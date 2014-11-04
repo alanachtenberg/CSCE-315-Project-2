@@ -81,15 +81,14 @@ void HUMAN_AI(){
                 break;//end game
             }
             else{
-                myServer->send_msg("OK\n");
+                //myServer->send_msg("OK\n");
                 vector<int> AI_move=AI.calc_move(board);
                 board.placePiece(AI_move[0],AI_move[1]);
-                if (is_displaying)
-                    myServer->send_msg(board.get_string_board(board));
-                else{
+
                 string move_msg;
                 stringstream ss;
-                ss<<AI_move[0]<<AI_move[1];
+                ss<<input.at(0)<<","<<input.at(1)<<","<<"BLACK;";
+                ss<<hex<<AI_move[0]<<","<<hex<<AI_move[1]<<","<<"WHITE;";
                 ss>>move_msg;
                     myServer->send_msg(move_msg);
                 }
@@ -98,7 +97,6 @@ void HUMAN_AI(){
             }
         }
     }
-}
 
 void run() {
     string pass;                          // string for password
