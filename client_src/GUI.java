@@ -8,9 +8,11 @@ public class GUI {
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				JFrame frame = new MainFrame("Five in a Row!");
-				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				frame.setVisible(true);
+				
+				JFrame menu= new MenuFrame("Five in a Row Menu");
+				menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				menu.setVisible(true);
+				
 			}
 		});
 	}
