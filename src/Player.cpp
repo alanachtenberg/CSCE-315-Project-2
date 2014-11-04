@@ -121,7 +121,7 @@
         vector<Cell> avail_moves=board.get_moves(board);
         int max=INT_MIN;
         int new_max=0;
-        int index=0;
+        int index=5;
        // Timer test;
         for (unsigned int i=0;i<avail_moves.size();++i){
          //   test.start();
@@ -129,7 +129,7 @@
             //NOTE placeValidatedPiece is an optimized place piece for when the piece has already been validated
             new_board.placeValidatedPiece(avail_moves[i].getX(),avail_moves[i].getY());//update board to new node
             new_max=minimax(new_board,MINMAX_DEPTH-1,false);
-            if(new_max>max){
+            if(new_max>=max){
 
                 index=i;
                 cout<<"MOVE# "<<avail_moves[i].getX()<<" # "<<avail_moves[i].getY()<<" NEW MAX ### "<<new_max<<" OLD MAX ### "<<max<<endl;
