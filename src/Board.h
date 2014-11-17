@@ -50,9 +50,10 @@ private:
 
 
 
-	std::string finish(Cell::STATE state);
+
 
 public:
+    std::string finish(Cell::STATE state);
     bool game_won;
     std::string error_message;
 //constructors
