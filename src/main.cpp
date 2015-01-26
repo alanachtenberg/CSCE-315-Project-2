@@ -49,6 +49,8 @@ void AI_AI(string input){//string contains server and port
     string opp_port;
     ss>>opp_server;
     ss>>opp_port;
+
+
 }
 void HUMAN_AI(Board& board){
 
